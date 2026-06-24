@@ -1,0 +1,1 @@
+enum AppState {initial,success,loading,error}
