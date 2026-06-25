@@ -2,10 +2,12 @@ import 'package:e_cource/feature/auth/presentation/provider/auth_provider.dart';
 import 'package:e_cource/feature/auth/presentation/widgets/custom_button_login.dart';
 import 'package:e_cource/general/enums/app_state.dart';
 import 'package:e_cource/general/widgets/custom_textfield.dart';
+import 'package:e_cource/general/core/services/go_route/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -46,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     // logo image
                     Image(
                       image: AssetImage(
-                        "/home/h/e_cource(admin)/assets/image/ecource_logo-removebg-preview.png",
+                        "assets/image/ecource_logo-removebg-preview.png",
                       ),
                       height: 200,
                     ),
@@ -90,28 +92,34 @@ class _LoginScreenState extends State<LoginScreen> {
                 // button
                 const Gap(20),
 
-                Consumer<AuthProvider>(
+                Consumer<AuthProviders>(
                   builder: (context, value, child) => CustomButtonLogin(
                     ontap: () async {
-                      if (globalKey.currentState!.validate()) {
-                        final email = emailController.text.trim();
-                        final pass = passController.text.trim();
+                      if (!globalKey.currentState!.validate()) return;
 
-                        await value.handleLogin(email: email, password: pass);
+                      final email = emailController.text.trim();
+                      final pass = passController.text.trim();
+                      await value.handleLogin(email: email, password: pass);
+                      if (!mounted) return;
+                      final loginResult = value.loginState;
+                      if (loginResult == AppState.error) {
+                        toastification.show(
+                          type: ToastificationType.error,
+                          title: Text(value.error ?? "Unknown error"),
+                        );
+                        return;
+                      }
 
-                        if (value.loginState == AppState.error) {
-                          toastification.show(
-                            type: ToastificationType.error,
-                            title: Text(value.error.toString()),
-                          );
-                        } else if (value.loginState == AppState.success) {
-                          toastification.show(
-                            type: ToastificationType.success,
-                            title: Text("Login success"),
-                          );
-                          emailController.clear();
-                          passController.clear();
-                        }
+                      if (loginResult == AppState.success) {
+                        toastification.show(
+                          type: ToastificationType.success,
+                          title: Text("Login success"),
+                        );
+
+                        emailController.clear();
+                        passController.clear();
+
+                        GoRouter.of(this.context).go(RouteNames.dahsboard);
                       }
                     },
                     widget: value.loginState == AppState.loading

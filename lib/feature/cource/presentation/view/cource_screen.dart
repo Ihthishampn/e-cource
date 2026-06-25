@@ -8,3 +8,8 @@ class CourceScreen extends StatelessWidget {
     return Scaffold();
   }
 }
+
+
+
+// complete this ui and settings ui by today
+

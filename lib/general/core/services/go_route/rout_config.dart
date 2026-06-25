@@ -1,21 +1,51 @@
+import 'dart:developer';
+
 import 'package:e_cource/feature/app_route/presentation/side_navigation_screen.dart';
 import 'package:e_cource/feature/auth/presentation/view/login_screen.dart';
 import 'package:e_cource/feature/cource/presentation/view/cource_screen.dart';
 import 'package:e_cource/feature/dashboard/presentation/view/dashbpard_screen.dart';
 import 'package:e_cource/feature/settings/presentation/view/settings_screen.dart';
+import 'package:e_cource/feature/students/presentation/view/students_screen.dart';
+import 'package:e_cource/feature/students/presentation/view/student_details_screen.dart';
+import 'package:e_cource/general/core/services/go_route/go_router_refresh_stream_auth.dart';
 import 'package:e_cource/general/core/services/go_route/route_names.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 final _rootNavigatorkey = GlobalKey<NavigatorState>();
-final _shellNavigatorKey = GlobalKey<NavigatorState>();
+
+CustomTransitionPage<void> _customTransitionPage(Widget child, GoRouterState state) {
+  return NoTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+  );
+}
 
 final router = GoRouter(
-
-
-
   navigatorKey: _rootNavigatorkey,
   initialLocation: RouteNames.loign,
+  refreshListenable: GoRouterRefreshStreamAuth(
+    FirebaseAuth.instance.authStateChanges(),
+  ),
+
+  redirect: (context, state) {
+    log("redirect start");
+
+    final isLoggedIn = FirebaseAuth.instance.currentUser != null;
+    final isLoginPage = state.matchedLocation == RouteNames.loign;
+
+    if (!isLoggedIn && !isLoginPage) {
+      return RouteNames.loign;
+    }
+
+    // logged in → block login page
+    if (isLoggedIn && isLoginPage) {
+      return RouteNames.dahsboard;
+    }
+
+    return null;
+  },
 
   routes: [
     // OUTER shell
@@ -25,25 +55,60 @@ final router = GoRouter(
     ),
 
     // main admin routes(shell bar)
-    ShellRoute(
-      navigatorKey: _shellNavigatorKey,
-      builder: (context, state, child) {
-        return SideNavigationScreen(child: child);
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
+        return SideNavigationScreen(navigationShell: navigationShell);
       },
-      routes: [
-        GoRoute(
-          path: RouteNames.dahsboard,
-          builder: (context, state) => DashboardScreen(),
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: RouteNames.dahsboard,
+              pageBuilder: (context, state) => _customTransitionPage(const DashboardScreen(), state),
+            ),
+          ],
         ),
-
-        GoRoute(
-          path: RouteNames.cources,
-          builder: (context, state) => CourceScreen(),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: RouteNames.students,
+              pageBuilder: (context, state) => _customTransitionPage(const StudentsScreen(), state),
+            ),
+            GoRoute(
+              path: RouteNames.studentDetails,
+              pageBuilder: (context, state) {
+                final extra = state.extra as Map<String, String>?;
+                return _customTransitionPage(
+                  StudentDetailsScreen(
+                    studentData: extra ?? {
+                      'name': 'amal dev',
+                      'phone': '+918590941583',
+                      'email': '---',
+                      'joinedAt': '25-06-2026',
+                      'status': 'Enable',
+                    },
+                  ),
+                  state,
+                );
+              },
+            ),
+          ],
         ),
-
-        GoRoute(
-          path: RouteNames.settings,
-          builder: (context, state) => SettingsScreen(),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: RouteNames.cources,
+              pageBuilder: (context, state) => _customTransitionPage(const CourceScreen(), state),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: RouteNames.settings,
+              pageBuilder: (context, state) => _customTransitionPage(const SettingsScreen(), state),
+            ),
+          ],
         ),
       ],
     ),

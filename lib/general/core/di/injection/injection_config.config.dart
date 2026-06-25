@@ -10,6 +10,8 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
+import 'package:e_cource/feature/auth/data/data_source/auth_local_data_source.dart'
+    as _i408;
 import 'package:e_cource/feature/auth/data/repo_impl/auth_repo_impl.dart'
     as _i632;
 import 'package:e_cource/feature/auth/domain/repository/auth_repo.dart'
@@ -47,8 +49,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i974.FirebaseFirestore>(),
       ),
     );
-    gh.factory<_i966.AuthProvider>(
-      () => _i966.AuthProvider(gh<_i292.AuthRepo>()),
+    gh.lazySingleton<_i408.AuthLocalDataSource>(
+      () => _i408.AuthLocalDataSource(gh<_i460.SharedPreferences>()),
+    );
+    gh.factory<_i966.AuthProviders>(
+      () => _i966.AuthProviders(
+        gh<_i292.AuthRepo>(),
+        gh<_i408.AuthLocalDataSource>(),
+      ),
     );
     return this;
   }

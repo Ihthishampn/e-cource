@@ -28,7 +28,8 @@ class AuthRepoImpl implements AuthRepo {
   }
 
   @override
-  Future<void> singOut() {
-    throw UnimplementedError();
+  Future<void> singOut() async {
+    await auth.signOut();
+    
   }
 }

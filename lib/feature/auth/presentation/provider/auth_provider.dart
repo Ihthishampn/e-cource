@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:e_cource/feature/auth/data/data_source/auth_local_data_source.dart';
 import 'package:e_cource/feature/auth/domain/repository/auth_repo.dart';
 import 'package:e_cource/general/enums/app_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,9 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
-class AuthProvider with ChangeNotifier {
+class AuthProviders with ChangeNotifier {
   final AuthRepo repo;
-  AuthProvider(this.repo);
+  final AuthLocalDataSource local;
+
+  AuthProviders(this.repo, this.local);
 
   AppState loginState = AppState.initial;
   String? error;
@@ -28,6 +31,10 @@ class AuthProvider with ChangeNotifier {
 
     try {
       await repo.singIn(email: email, password: password);
+      // save in localy
+
+      await local.saveLoginKey(email: email);
+      log("login key saves succefully");
       loginState = AppState.success;
     } on FirebaseAuthException catch (e) {
       log("fb auth eception : ${e.message}");
@@ -40,6 +47,18 @@ class AuthProvider with ChangeNotifier {
 
       log("error find from provider file $e");
     }
+    notifyListeners();
+  }
+
+  Future<void> logout() async {
+    try {
+      await repo.singOut();
+    } catch (_) {
+      // ignore sign out errors, still clear local login state
+    }
+    await local.clearKey();
+    loginState = AppState.initial;
+    error = null;
     notifyListeners();
   }
 }

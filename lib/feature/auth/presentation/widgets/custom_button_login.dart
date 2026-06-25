@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:e_cource/general/core/theme/app_colors.dart';
 
 class CustomButtonLogin extends StatelessWidget {
   final VoidCallback ontap;
@@ -13,7 +14,7 @@ class CustomButtonLogin extends StatelessWidget {
       child: ElevatedButton(
         onPressed: ontap,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
+          backgroundColor: AppColors.primaryColor,
           foregroundColor: Colors.white,
           elevation: 3,
           shape: RoundedRectangleBorder(
