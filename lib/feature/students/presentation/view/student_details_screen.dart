@@ -73,7 +73,6 @@ class StudentDetailsScreen extends StatelessWidget {
 
           const SliverGap(40),
 
-          // Divider Line
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverToBoxAdapter(
@@ -86,13 +85,11 @@ class StudentDetailsScreen extends StatelessWidget {
 
           const SliverGap(30),
 
-          // Courses & Course Allocation Section
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverToBoxAdapter(
               child: StudentCoursesView(
                 onAllocateNewCourse: () {
-                  // Allocation function placeholder
                 },
               ),
             ),
