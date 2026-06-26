@@ -3,7 +3,6 @@ import 'package:e_cource/feature/students/presentation/widgets/student_profile_i
 import 'package:e_cource/general/core/theme/app_colors.dart';
 import 'package:e_cource/general/core/theme/app_text_styles.dart';
 import 'package:e_cource/general/widgets/custom_main_header.dart';
-import 'package:e_cource/general/core/services/go_route/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
@@ -22,7 +21,6 @@ class StudentDetailsScreen extends StatelessWidget {
           parent: AlwaysScrollableScrollPhysics(),
         ),
         slivers: [
-          // Header with greeting, date & time
           const CustomMainHeader(),
 
           // Title & Back Button Row
@@ -37,7 +35,7 @@ class StudentDetailsScreen extends StatelessWidget {
                     style: AppTextStyles.heading2,
                   ),
                   ElevatedButton(
-                    onPressed: () => context.go(RouteNames.students),
+                    onPressed: () => context.pop(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
                       foregroundColor: Colors.white,

@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
-
+import 'package:e_cource/general/widgets/custom_main_header.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/add_course_card.dart';
 import '../widgets/course_action_bar.dart';
 import '../widgets/course_card.dart';
-import '../widgets/course_header.dart';
 
 class CourceScreen extends StatelessWidget {
   const CourceScreen({super.key});
@@ -16,9 +14,7 @@ class CourceScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
-          const SliverToBoxAdapter(
-            child: CourseHeader(),
-          ),
+          const CustomMainHeader(),
           const SliverToBoxAdapter(
             child: CourseActionBar(),
           ),
@@ -44,7 +40,7 @@ class CourceScreen extends StatelessWidget {
                     category: 'Consulting',
                     priceType: 'Paid',
                     price: '₹62,000/-',
-                    imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2940&auto=format&fit=crop',
+                    imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=600&auto=format&fit=crop',
                   );
                 },
                 childCount: 6,

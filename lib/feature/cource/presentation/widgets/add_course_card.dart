@@ -8,10 +8,12 @@ class AddCourseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        showDialog(
+        showGeneralDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) => const AddCourseDialog(),
+          barrierColor: Colors.black54,
+          transitionDuration: Duration.zero,
+          pageBuilder: (context, animation, secondaryAnimation) => const AddCourseDialog(),
         );
       },
       borderRadius: BorderRadius.circular(16),

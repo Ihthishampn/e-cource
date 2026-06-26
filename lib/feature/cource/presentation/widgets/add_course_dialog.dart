@@ -1,30 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:e_cource/feature/cource/presentation/provider/course_provider.dart';
 
-class AddCourseDialog extends StatefulWidget {
+class AddCourseDialog extends StatelessWidget {
   const AddCourseDialog({super.key});
 
   @override
-  State<AddCourseDialog> createState() => _AddCourseDialogState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => CourseProvider(),
+      child: const _AddCourseDialogContent(),
+    );
+  }
 }
 
-class _AddCourseDialogState extends State<AddCourseDialog> {
+class _AddCourseDialogContent extends StatefulWidget {
+  const _AddCourseDialogContent();
+
+  @override
+  State<_AddCourseDialogContent> createState() => _AddCourseDialogContentState();
+}
+
+class _AddCourseDialogContentState extends State<_AddCourseDialogContent> {
   final TextEditingController _tagController = TextEditingController();
-  final List<String> _tags = [];
 
   void _addTag() {
     final text = _tagController.text.trim();
-    if (text.isNotEmpty && !_tags.contains(text)) {
-      setState(() {
-        _tags.add(text);
-        _tagController.clear();
-      });
+    if (text.isNotEmpty) {
+      context.read<CourseProvider>().addTag(text);
+      _tagController.clear();
     }
   }
 
   void _removeTag(String tag) {
-    setState(() {
-      _tags.remove(tag);
-    });
+    context.read<CourseProvider>().removeTag(tag);
   }
 
   @override
@@ -231,10 +240,13 @@ class _AddCourseDialogState extends State<AddCourseDialog> {
                       ],
                     ),
                     
-                    if (_tags.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12.0),
-                        child: Container(
+                    Consumer<CourseProvider>(
+                      builder: (context, provider, child) {
+                        if (provider.tags.isEmpty) return const SizedBox.shrink();
+                        
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 12.0),
+                          child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
@@ -244,7 +256,7 @@ class _AddCourseDialogState extends State<AddCourseDialog> {
                           child: Wrap(
                             spacing: 8,
                             runSpacing: 8,
-                            children: _tags.map((tag) {
+                            children: provider.tags.map((tag) {
                               return Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
@@ -274,7 +286,9 @@ class _AddCourseDialogState extends State<AddCourseDialog> {
                             }).toList(),
                           ),
                         ),
-                      ),
+                      );
+                      }
+                    ),
                     
                     const SizedBox(height: 16),
 

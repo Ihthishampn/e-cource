@@ -1,7 +1,8 @@
 import 'dart:developer';
 // testadmin@gmail.com
-//22 22 22
+//222222
 import 'package:e_cource/feature/auth/presentation/provider/auth_provider.dart';
+import 'package:e_cource/feature/settings/presentation/provider/settings_tab_provider.dart';
 import 'package:e_cource/firebase_options.dart';
 import 'package:e_cource/general/core/di/injection/injection_config.dart';
 import 'package:e_cource/general/core/services/go_route/rout_config.dart';
@@ -25,7 +26,6 @@ void main() async {
     await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
   }
 
-  // Wait for Firebase Auth to fully initialize and restore session
   await FirebaseAuth.instance.authStateChanges().first;
 
   log("firebase initialize complete");
@@ -38,6 +38,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => sl<AuthProviders>()),
+        ChangeNotifierProvider(create: (context) => SettingsTabProvider()),
       ],
       child: const EcourceApp(),
     ),

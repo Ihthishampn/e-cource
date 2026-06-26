@@ -3,8 +3,9 @@ import 'dart:developer';
 import 'package:e_cource/feature/app_route/presentation/side_navigation_screen.dart';
 import 'package:e_cource/feature/auth/presentation/view/login_screen.dart';
 import 'package:e_cource/feature/cource/presentation/view/cource_screen.dart';
+import 'package:e_cource/feature/cource/presentation/view/course_details_screen.dart';
 import 'package:e_cource/feature/dashboard/presentation/view/dashbpard_screen.dart';
-import 'package:e_cource/feature/settings/presentation/view/settings_screen.dart';
+import 'package:e_cource/feature/settings/presentation/view/main/settings_screen.dart';
 import 'package:e_cource/feature/students/presentation/view/students_screen.dart';
 import 'package:e_cource/feature/students/presentation/view/student_details_screen.dart';
 import 'package:e_cource/general/core/services/go_route/go_router_refresh_stream_auth.dart';
@@ -73,24 +74,26 @@ final router = GoRouter(
             GoRoute(
               path: RouteNames.students,
               pageBuilder: (context, state) => _customTransitionPage(const StudentsScreen(), state),
-            ),
-            GoRoute(
-              path: RouteNames.studentDetails,
-              pageBuilder: (context, state) {
-                final extra = state.extra as Map<String, String>?;
-                return _customTransitionPage(
-                  StudentDetailsScreen(
-                    studentData: extra ?? {
-                      'name': 'amal dev',
-                      'phone': '+918590941583',
-                      'email': '---',
-                      'joinedAt': '25-06-2026',
-                      'status': 'Enable',
-                    },
-                  ),
-                  state,
-                );
-              },
+              routes: [
+                GoRoute(
+                  path: 'details',
+                  pageBuilder: (context, state) {
+                    final extra = state.extra as Map<String, String>?;
+                    return _customTransitionPage(
+                      StudentDetailsScreen(
+                        studentData: extra ?? {
+                          'name': 'amal dev',
+                          'phone': '+918590941583',
+                          'email': '---',
+                          'joinedAt': '25-06-2026',
+                          'status': 'Enable',
+                        },
+                      ),
+                      state,
+                    );
+                  },
+                ),
+              ],
             ),
           ],
         ),
@@ -99,6 +102,12 @@ final router = GoRouter(
             GoRoute(
               path: RouteNames.cources,
               pageBuilder: (context, state) => _customTransitionPage(const CourceScreen(), state),
+              routes: [
+                GoRoute(
+                  path: 'details',
+                  pageBuilder: (context, state) => _customTransitionPage(const CourseDetailsScreen(), state),
+                ),
+              ],
             ),
           ],
         ),

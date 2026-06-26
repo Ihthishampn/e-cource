@@ -1,5 +1,6 @@
+import 'package:e_cource/general/core/services/go_route/route_names.dart';
 import 'package:flutter/material.dart';
-
+import 'package:go_router/go_router.dart';
 class CourseCard extends StatelessWidget {
   final String title;
   final String duration;
@@ -22,8 +23,13 @@ class CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
+    return RepaintBoundary(
+      child: GestureDetector(
+        onTap: () {
+          context.push(RouteNames.courseDetails);
+        },
+        child: Container(
+        decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: Colors.white,
         boxShadow: [
@@ -144,7 +150,8 @@ class CourseCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+      ),
+    ));
   }
 
   Widget _buildTag(String text, Color color) {

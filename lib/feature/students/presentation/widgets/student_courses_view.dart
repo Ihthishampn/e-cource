@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 class StudentCoursesView extends StatelessWidget {
@@ -14,11 +15,10 @@ class StudentCoursesView extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Left tab button: Courses (Orange background, white text)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                color: const Color(0xFFFF4E11), // Orange shade matching reference
+                color:  Colors.green, 
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Text(
