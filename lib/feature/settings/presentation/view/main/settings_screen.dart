@@ -75,6 +75,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     scrollController.dispose();
     termsDescriptionHeadercontroller.dispose();
     termsHeadercontroller.dispose();
+    helpContactController.dispose();
+    privacyHeaderController.dispose();
+    privacyDescriptionController.dispose();
+    helpContactController.dispose();
+    helpEmailController.dispose();
+
 
     super.dispose();
   }

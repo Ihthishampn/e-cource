@@ -2,6 +2,7 @@ import 'dart:developer';
 // testadmin@gmail.com
 //222222
 import 'package:e_cource/feature/auth/presentation/provider/auth_provider.dart';
+import 'package:e_cource/feature/cource/presentation/provider/course_firebase_provider.dart';
 import 'package:e_cource/feature/settings/presentation/provider/settings_tab_provider.dart';
 import 'package:e_cource/firebase_options.dart';
 import 'package:e_cource/general/core/di/injection/injection_config.dart';
@@ -38,6 +39,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => sl<AuthProviders>()),
+        ChangeNotifierProvider(create: (context) => sl<CourseFirebaseProvider>()),
         ChangeNotifierProvider(create: (context) => SettingsTabProvider()),
       ],
       child: const EcourceApp(),

@@ -1,3 +1,4 @@
+import 'package:e_cource/general/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class LiveSettingsScreen extends StatelessWidget {
@@ -23,7 +24,7 @@ class LiveSettingsScreen extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF5722), // Orange
+                  backgroundColor: AppColors.primaryColor,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
@@ -91,7 +92,7 @@ class LiveSettingsScreen extends StatelessWidget {
     );
   }
 }
-
+   
 class ZoomAccountCard extends StatelessWidget {
   final String accountName;
   final String meetingId;

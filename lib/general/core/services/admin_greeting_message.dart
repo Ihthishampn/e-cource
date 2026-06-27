@@ -9,9 +9,9 @@ String getGreetingMessage() {
   if (hour >= 12 && hour < 16) {
     return 'Good Afternoon ';
   } else if (hour >= 16 && hour < 20) {
-    return 'Good Evening ';
+    return 'Good Evening  ';
   } else {
-    return 'Good Morning ';
+    return 'Good Morning';
   }
 }
 

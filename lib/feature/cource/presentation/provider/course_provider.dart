@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class CourseProvider extends ChangeNotifier {
-  // Course Details Screen State
   int _selectedTabIndex = 0;
   int get selectedTabIndex => _selectedTabIndex;
 
@@ -10,7 +9,6 @@ class CourseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Add Course Dialog State (Tags)
   final List<String> _tags = [];
   List<String> get tags => _tags;
 

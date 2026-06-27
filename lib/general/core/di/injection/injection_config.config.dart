@@ -18,6 +18,13 @@ import 'package:e_cource/feature/auth/domain/repository/auth_repo.dart'
     as _i292;
 import 'package:e_cource/feature/auth/presentation/provider/auth_provider.dart'
     as _i966;
+import 'package:e_cource/feature/cource/data/repo_impl/course_repo_impl.dart'
+    as _i618;
+import 'package:e_cource/feature/cource/data/use_case/course_category_use_case.dart'
+    as _i903;
+import 'package:e_cource/feature/cource/domain/course_repo.dart' as _i106;
+import 'package:e_cource/feature/cource/presentation/provider/course_firebase_provider.dart'
+    as _i342;
 import 'package:e_cource/general/core/di/module/firebase_module.dart' as _i973;
 import 'package:e_cource/general/core/di/module/local_storage_module.dart'
     as _i63;
@@ -43,6 +50,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => firebaseModule.firebaseFirestore(),
     );
     gh.lazySingleton<_i59.FirebaseAuth>(() => firebaseModule.firebaseAuth());
+    gh.lazySingleton<_i106.CourseRepo>(
+      () => _i618.CourseRepoImpl(gh<_i974.FirebaseFirestore>()),
+    );
     gh.lazySingleton<_i292.AuthRepo>(
       () => _i632.AuthRepoImpl(
         gh<_i59.FirebaseAuth>(),
@@ -52,11 +62,17 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i408.AuthLocalDataSource>(
       () => _i408.AuthLocalDataSource(gh<_i460.SharedPreferences>()),
     );
+    gh.lazySingleton<_i903.CourseCategoryUseCase>(
+      () => _i903.CourseCategoryUseCase(gh<_i106.CourseRepo>()),
+    );
     gh.factory<_i966.AuthProviders>(
       () => _i966.AuthProviders(
         gh<_i292.AuthRepo>(),
         gh<_i408.AuthLocalDataSource>(),
       ),
+    );
+    gh.factory<_i342.CourseFirebaseProvider>(
+      () => _i342.CourseFirebaseProvider(gh<_i903.CourseCategoryUseCase>()),
     );
     return this;
   }
