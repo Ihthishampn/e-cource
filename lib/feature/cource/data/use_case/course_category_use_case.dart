@@ -1,4 +1,3 @@
-
 import 'dart:typed_data';
 
 import 'package:e_cource/feature/cource/data/model/add_main_category_model.dart';
@@ -11,16 +10,17 @@ class CourseCategoryUseCase {
   final CourseRepo repo;
   CourseCategoryUseCase(this.repo);
 
-  Future<void> addMainCategory({
+  Future<AddMainCategoryModel> addMainCategory({
     required String name,
     required Uint8List imageFile,
   }) async {
     return await repo.addMainCategory(name: name, imageFile: imageFile);
   }
 
-  @override
-  Future<List<AddMainCategoryModel>> getCategoryList() {
-    // TODO: implement getCategoryList
-    throw UnimplementedError();
+  
+  Future<List<AddMainCategoryModel>> getCategoryList() async{
+    return await  repo.getCategoryList();
+  }  Future<List<AddMainCategoryModel>> searchCategoryList({required String q}) async{
+    return await  repo.searchCategory(query: q);
   }
 }

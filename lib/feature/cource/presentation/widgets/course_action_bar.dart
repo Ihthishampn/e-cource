@@ -31,9 +31,15 @@ class CourseActionBar extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
                 ),
-                child: const Text('All Courses', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: const Text(
+                  'All Courses',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -57,7 +63,7 @@ class CourseActionBar extends StatelessWidget {
                   showDialog(
                     context: context,
                     barrierDismissible: false,
-                    builder: (context) => const AddMainCategoryDialog(),
+                    builder: (context) =>  AddMainCategoryDialog(),
                   );
                 },
                 icon: const Icon(Icons.add, size: 18),
@@ -68,7 +74,10 @@ class CourseActionBar extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
                 ),
               ),
             ],

@@ -2,11 +2,14 @@ class AddMainCategoryModel {
   final String id;
   final String name;
   final String image;
+    final List<String> keywords;
+
 
   AddMainCategoryModel({
     required this.id,
     required this.name,
     required this.image,
+    required this.keywords,
   });
 
   factory AddMainCategoryModel.fromMap(
@@ -17,6 +20,7 @@ class AddMainCategoryModel {
       id: id,
       name: map['name'] ?? '',
       image: map['image'] ?? '',
+      keywords: List<String>.from(map["keywords"] ?? []),
     );
   }
 
@@ -25,6 +29,7 @@ class AddMainCategoryModel {
       "id":id,
       'name': name,
       'image': image,
+      'keywords': keywords,
     };
   }
 }

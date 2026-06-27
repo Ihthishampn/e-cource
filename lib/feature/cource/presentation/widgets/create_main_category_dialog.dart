@@ -252,7 +252,7 @@ class _CreateMainCategoryDialogState extends State<CreateMainCategoryDialog> {
                                           const Icon(Icons.check_circle, color: Colors.green, size: 16),
                                           const SizedBox(width: 4),
                                           Text(
-                                            '${_imageWidth} × ${_imageHeight}',
+                                            '$_imageWidth × $_imageHeight',
                                             style: const TextStyle(
                                               color: Colors.green,
                                               fontSize: 12,
