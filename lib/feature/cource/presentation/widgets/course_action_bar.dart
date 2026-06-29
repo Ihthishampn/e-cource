@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../general/core/theme/app_colors.dart';
-import 'add_main_category_dialog.dart';
+import 'add_category_widgets/add_main_category_dialog.dart';
 
 class CourseActionBar extends StatelessWidget {
   const CourseActionBar({super.key});

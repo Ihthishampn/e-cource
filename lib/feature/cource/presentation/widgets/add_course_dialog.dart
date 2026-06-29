@@ -1,7 +1,32 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:e_cource/feature/cource/presentation/provider/course_provider.dart';
 
+import 'package:e_cource/feature/cource/data/model/course_model.dart';
+import 'package:e_cource/feature/cource/presentation/provider/course_firebase_provider.dart';
+import 'package:e_cource/feature/cource/presentation/provider/course_provider.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/course_image_picker.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/dilogue_action.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/dilogue_header.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/dilogue_section.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/dilogue_text_field.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/tag_input_section.dart';
+import 'package:e_cource/general/enums/app_state.dart';
+import 'package:e_cource/general/widgets/build_search_keywords.dart';
+import 'package:e_cource/general/widgets/custom_toast.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import 'course_add_widgets/yes_not_widget.dart';
+
+
+
+const List<String> _durations = [
+  '1 Month',
+  '3 Months',
+  '6 Months',
+  '1 Year',
+];
+
+/// Outer wrapper — provides CourseProvider to the subtree.
 class AddCourseDialog extends StatelessWidget {
   const AddCourseDialog({super.key});
 
@@ -9,20 +34,52 @@ class AddCourseDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => CourseProvider(),
-      child: const _AddCourseDialogContent(),
+      child: const _AddCourseDialogBody(),
     );
   }
 }
 
-class _AddCourseDialogContent extends StatefulWidget {
-  const _AddCourseDialogContent();
+class _AddCourseDialogBody extends StatefulWidget {
+  const _AddCourseDialogBody();
 
   @override
-  State<_AddCourseDialogContent> createState() => _AddCourseDialogContentState();
+  State<_AddCourseDialogBody> createState() => _AddCourseDialogBodyState();
 }
 
-class _AddCourseDialogContentState extends State<_AddCourseDialogContent> {
-  final TextEditingController _tagController = TextEditingController();
+class _AddCourseDialogBodyState extends State<_AddCourseDialogBody> {
+  final _courseNameController = TextEditingController();
+  final _tutorController = TextEditingController();
+  final _tagController = TextEditingController();
+  final _priceController = TextEditingController();
+  final _offerPriceController = TextEditingController();
+  final _taxController = TextEditingController();
+  final _applePriceController = TextEditingController();
+  final _appleOfferPriceController = TextEditingController();
+
+  Uint8List? _imageBytes;
+  String? _selectedDuration;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final fp = context.read<CourseFirebaseProvider>();
+      if (fp.mcList.isEmpty) fp.handleFetchMainCategory();
+    });
+  }
+
+  @override
+  void dispose() {
+    _courseNameController.dispose();
+    _tutorController.dispose();
+    _tagController.dispose();
+    _priceController.dispose();
+    _offerPriceController.dispose();
+    _taxController.dispose();
+    _applePriceController.dispose();
+    _appleOfferPriceController.dispose();
+    super.dispose();
+  }
 
   void _addTag() {
     final text = _tagController.text.trim();
@@ -32,14 +89,62 @@ class _AddCourseDialogContentState extends State<_AddCourseDialogContent> {
     }
   }
 
-  void _removeTag(String tag) {
-    context.read<CourseProvider>().removeTag(tag);
-  }
+  Future<void> _handleAdd() async {
+    final cp = context.read<CourseProvider>();
 
-  @override
-  void dispose() {
-    _tagController.dispose();
-    super.dispose();
+    if (_imageBytes == null) {
+      showToast(msg: 'Course image is required');
+      return;
+    }
+    if (cp.selectedCategory == null) {
+      showToast(msg: 'Please select a category');
+      return;
+    }
+    if (_courseNameController.text.trim().isEmpty) {
+      showToast(msg: 'Course name is required');
+      return;
+    }
+    if (_selectedDuration == null) {
+      showToast(msg: 'Please select a duration');
+      return;
+    }
+
+    final model = CourseModel(
+      id: '',
+      name: _courseNameController.text.trim(),
+      image: '',
+      categoryId: cp.selectedCategory!.id,
+      categoryName: cp.selectedCategory!.name,
+      tutor: _tutorController.text.trim(),
+      tags: List<String>.from(cp.tags),
+      price: double.tryParse(_priceController.text) ?? 0,
+      offerPrice: double.tryParse(_offerPriceController.text) ?? 0,
+      tax: double.tryParse(_taxController.text) ?? 0,
+      applePrice: double.tryParse(_applePriceController.text) ?? 0,
+      appleOfferPrice: double.tryParse(_appleOfferPriceController.text) ?? 0,
+      duration: _selectedDuration!,
+      hasLiveClasses: cp.hasLiveClasses,
+      hasStudyMaterials: cp.hasStudyMaterials,
+      availableOnPC: cp.availableOnPC,
+      isPopular: cp.isPopular,
+      listOnIOS: cp.listOnIOS,
+      isLifeLong: cp.isLifeLong,
+      keywords: keywordsBuilder(_courseNameController.text.trim()),
+    );
+
+    await context
+        .read<CourseFirebaseProvider>()
+        .handleAddCourse(model: model, imageFile: _imageBytes!);
+
+    if (!mounted) return;
+
+    final fp = context.read<CourseFirebaseProvider>();
+    if (fp.addCourseState == AppState.success) {
+      showToast(msg: 'Course added successfully');
+      Navigator.pop(context);
+    } else if (fp.addCourseState == AppState.error) {
+      showToast(msg: fp.addCourseerror ?? 'Failed to add course');
+    }
   }
 
   @override
@@ -52,401 +157,104 @@ class _AddCourseDialogContentState extends State<_AddCourseDialogContent> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              decoration: const BoxDecoration(
-                color: Color(0xFF333333),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Add Course',
-                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  InkWell(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.cancel, color: Colors.white),
-                  ),
-                ],
-              ),
+            DialogHeader(
+              title: 'Add Course',
+              onClose: () => Navigator.pop(context),
             ),
-            // Body
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Course Image Section
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Text.rich(
-                            TextSpan(
-                              text: 'Course Image ',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                              children: [
-                                const TextSpan(
-                                  text: '(Max 5MB -\nJPG, PNG)* ',
-                                  style: TextStyle(color: Colors.grey, fontWeight: FontWeight.normal, fontSize: 12),
-                                ),
-                                WidgetSpan(
-                                  child: Icon(Icons.info_outline, size: 14, color: Colors.grey.shade500),
-                                ),
-                              ],
-                            ),
-                          ),
+                padding: const EdgeInsets.all(24),
+                child: Consumer<CourseProvider>(
+                  builder: (context, cp, _) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DialogSectionRow(
+                        label: 'Course Image',
+                        required: true,
+                        hint: '(Max 5MB – JPG, PNG)',
+                        child: CourseImagePicker(
+                          onImagePicked: (bytes, _, __, ___) {
+                            setState(() => _imageBytes = bytes);
+                          },
                         ),
-                        Expanded(
-                          flex: 3,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.black87),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: const Text('Choose File', style: TextStyle(color: Colors.black54)),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  const Text('No File Choosen', style: TextStyle(color: Colors.grey)),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  // Dashed box equivalent
-                                  Container(
-                                    height: 100,
-                                    width: 150,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.grey.shade400, style: BorderStyle.solid), 
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Center(
-                                      child: Icon(Icons.image_outlined, color: Colors.grey.shade400, size: 30),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Text(
-                                    'Suggested Image Size: 5MB\n16/9 Aspect ratio',
-                                    style: TextStyle(color: Colors.blue.shade300, fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
+                      ),
+                      _divider(),
+                      DialogSectionRow(
+                        label: 'Category',
+                        required: true,
+                        child: _CategoryDropdown(cp: cp),
+                      ),
+                      _divider(),
+                      DialogSectionRow(
+                        label: 'Course Name',
+                        required: true,
+                        child: DialogTextField(
+                          controller: _courseNameController,
+                          hint: 'Enter course name',
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // Introduction Video Section
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 2,
-                          child: Text.rich(
-                            TextSpan(
-                              text: 'Introduction Video ',
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                              children: [
-                                const TextSpan(
-                                  text: '(Max 50MB - MP4)* ',
-                                  style: TextStyle(color: Colors.grey, fontWeight: FontWeight.normal, fontSize: 12),
-                                ),
-                                WidgetSpan(
-                                  child: Icon(Icons.info_outline, size: 14, color: Colors.grey.shade500),
-                                ),
-                              ],
-                            ),
-                          ),
+                      ),
+                      _divider(),
+                      DialogSectionRow(
+                        label: 'Tutor',
+                        child: DialogTextField(
+                          controller: _tutorController,
+                          hint: 'Add tutor name',
                         ),
-                        Expanded(
-                          flex: 3,
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black87),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Text('Choose Video', style: TextStyle(color: Colors.black54)),
-                            ),
-                          ),
+                      ),
+                      _divider(),
+                      DialogSectionRow(
+                        label: 'Course Tags',
+                        child: TagInputSection(
+                          controller: _tagController,
+                          tags: cp.tags,
+                          onAdd: _addTag,
+                          onRemove: cp.removeTag,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Category
-                    _buildLabel('Category*'),
-                    _buildTextField('Select Category'),
-                    const SizedBox(height: 16),
-                    
-                    // Course Name
-                    _buildLabel('Course Name*'),
-                    _buildTextField('Enter Name'),
-                    const SizedBox(height: 16),
-
-                    // Add Tutor
-                    _buildTextField('Add Tutor'),
-                    const SizedBox(height: 16),
-
-                    // Add Course Tags
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _tagController,
-                            onSubmitted: (_) => _addTag(),
-                            decoration: InputDecoration(
-                              hintText: 'Add Course Tags',
-                              hintStyle: TextStyle(color: Colors.grey.shade400, fontStyle: FontStyle.italic),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: Colors.grey.shade300),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: Colors.grey.shade300),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                            ),
-                          ),
+                      ),
+                      _divider(),
+                      DialogSectionRow(
+                        label: 'Pricing',
+                        required: true,
+                        child: _PricingRow(
+                          priceController: _priceController,
+                          offerPriceController: _offerPriceController,
+                          taxController: _taxController,
                         ),
-                        const SizedBox(width: 8),
-                        InkWell(
-                          onTap: _addTag,
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: const BoxDecoration(
-                              color: Colors.blueAccent,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.add, color: Colors.white, size: 24),
-                          ),
+                      ),
+                      _divider(),
+                      DialogSectionRow(
+                        label: 'Apple Pricing',
+                        required: true,
+                        child: _ApplePricingRow(
+                          applePriceController: _applePriceController,
+                          appleOfferPriceController: _appleOfferPriceController,
                         ),
-                      ],
-                    ),
-                    
-                    Consumer<CourseProvider>(
-                      builder: (context, provider, child) {
-                        if (provider.tags.isEmpty) return const SizedBox.shrink();
-                        
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 12.0),
-                          child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: provider.tags.map((tag) {
-                              return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: Colors.red.shade50,
-                                  border: Border.all(color: Colors.red.shade200),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(tag, style: const TextStyle(fontSize: 12, color: Colors.black87)),
-                                    const SizedBox(width: 8),
-                                    InkWell(
-                                      onTap: () => _removeTag(tag),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(2),
-                                        decoration: const BoxDecoration(
-                                          color: Colors.redAccent,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: const Icon(Icons.close, color: Colors.white, size: 10),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                          ),
+                      ),
+                      _divider(),
+                      DialogSectionRow(
+                        label: 'Course Duration',
+                        required: true,
+                        child: _DurationDropdown(
+                          selected: _selectedDuration,
+                          onChanged: (val) =>
+                              setState(() => _selectedDuration = val),
                         ),
-                      );
-                      }
-                    ),
-                    
-                    const SizedBox(height: 16),
-
-                    // Price row
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildLabel('Price*'),
-                              _buildTextField('Price', isItalic: true),
-                            ],
-                          ),
+                      ),
+                      _divider(),
+                      DialogSectionRow(
+                        label: 'Course Options',
+                        child: _CourseOptionsGrid(cp: cp),
+                      ),
+                      const SizedBox(height: 32),
+                      Consumer<CourseFirebaseProvider>(
+                        builder: (context, fp, _) => DialogActions(
+                          onCancel: () => Navigator.pop(context),
+                          onConfirm: _handleAdd,
+                          isLoading: fp.addCourseState == AppState.loading,
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildLabel('Offer Price*'),
-                              _buildTextField('Offer Price', isItalic: true),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildLabel('Tax*'),
-                              TextField(
-                                decoration: InputDecoration(
-                                  hintText: 'Tax %',
-                                  hintStyle: TextStyle(color: Colors.grey.shade400, fontStyle: FontStyle.italic),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(color: Colors.grey.shade300),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(color: Colors.grey.shade300),
-                                  ),
-                                  suffixIcon: const Icon(Icons.percent, color: Colors.black87),
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Apple prices
-                    Row(
-                      children: [
-                        Expanded(child: _buildTextField('Apple Price*', isItalic: true)),
-                        const SizedBox(width: 16),
-                        Expanded(child: _buildTextField('Apple Offer Price*', isItalic: true)),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Course Duration
-                    Row(
-                      children: [
-                        const Expanded(
-                          flex: 1,
-                          child: Text('Course Duration*', style: TextStyle(color: Colors.grey, fontSize: 14)),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade300),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('Select Duration*', style: TextStyle(color: Colors.grey.shade400, fontStyle: FontStyle.italic)),
-                                const Icon(Icons.arrow_drop_down, color: Colors.grey),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const Expanded(flex: 1, child: SizedBox()), // To match proportion
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Radio Grid
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            children: [
-                              _buildRadioRow('Live Classes?', true),
-                              const SizedBox(height: 16),
-                              _buildRadioRow('Available On PC?', false),
-                              const SizedBox(height: 16),
-                              _buildRadioRow('List on IOS?', false, showAlt: true),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 32),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              _buildRadioRow('All Study Materials?', false),
-                              const SizedBox(height: 16),
-                              _buildRadioRow('Popular Course?', false),
-                              const SizedBox(height: 16),
-                              _buildRadioRow('Is Life Long?', true, showAlt: true),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Action Buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey.shade300,
-                            foregroundColor: Colors.black87,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                            elevation: 0,
-                          ),
-                          child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                        const SizedBox(width: 12),
-                        ElevatedButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                            elevation: 0,
-                          ),
-                          child: const Text('Add', style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -456,70 +264,255 @@ class _AddCourseDialogContentState extends State<_AddCourseDialogContent> {
     );
   }
 
-  Widget _buildLabel(String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text.rich(
-        TextSpan(
-          text: text.replaceAll('*', ''),
-          style: const TextStyle(fontWeight: FontWeight.bold),
-          children: [
-            if (text.contains('*'))
-              const TextSpan(text: '*', style: TextStyle(color: Colors.red)),
-          ],
-        ),
-      ),
+  Widget _divider() => const Padding(
+        padding: EdgeInsets.symmetric(vertical: 16),
+        child: Divider(height: 1, color: Color(0xFFEEEEEE)),
+      );
+}
+
+// ── Local-scope small widgets (tightly coupled to this dialog) ────────────────
+
+class _CategoryDropdown extends StatelessWidget {
+  const _CategoryDropdown({required this.cp});
+  final CourseProvider cp;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<CourseFirebaseProvider>(
+      builder: (context, fp, _) {
+        if (fp.getCategoryState == AppState.loading) {
+          return Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Row(
+              children: [
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+                SizedBox(width: 12),
+                Text('Loading categories...',
+                    style: TextStyle(color: Colors.grey)),
+              ],
+            ),
+          );
+        }
+
+        final categories = fp.mcList;
+
+        return DropdownButtonFormField<String>(
+          value: cp.selectedCategory?.id,
+          isExpanded: true,
+          hint: Text(
+            'Select Category',
+            style: TextStyle(
+                color: Colors.grey.shade400, fontStyle: FontStyle.italic),
+          ),
+          decoration: _dropdownDecoration(),
+          items: categories
+              .map((c) =>
+                  DropdownMenuItem<String>(value: c.id, child: Text(c.name)))
+              .toList(),
+          onChanged: (id) {
+            if (id == null) return;
+            cp.setSelectedCategory(categories.firstWhere((c) => c.id == id));
+          },
+        );
+      },
     );
   }
+}
 
-  Widget _buildTextField(String hint, {bool isItalic = false}) {
-    return TextField(
-      decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey.shade400, fontStyle: isItalic ? FontStyle.italic : FontStyle.normal),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+class _DurationDropdown extends StatelessWidget {
+  const _DurationDropdown({required this.selected, required this.onChanged});
+
+  final String? selected;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<String>(
+      value: selected,
+      isExpanded: true,
+      hint: Text(
+        'Select Duration',
+        style: TextStyle(
+            color: Colors.grey.shade400, fontStyle: FontStyle.italic),
       ),
+      decoration: _dropdownDecoration(),
+      items: _durations
+          .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+          .toList(),
+      onChanged: onChanged,
     );
   }
+}
 
-  Widget _buildRadioRow(String label, bool isYesSelected, {bool showAlt = false}) {
-    bool yesSelected = isYesSelected;
-    if (showAlt) yesSelected = false;
+class _PricingRow extends StatelessWidget {
+  const _PricingRow({
+    required this.priceController,
+    required this.offerPriceController,
+    required this.taxController,
+  });
 
+  final TextEditingController priceController;
+  final TextEditingController offerPriceController;
+  final TextEditingController taxController;
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w500)),
-        Row(
-          children: [
-            _buildRadioButton(yesSelected, 'Yes'),
-            const SizedBox(width: 24),
-            _buildRadioButton(!yesSelected, 'No'),
-          ],
+        Expanded(
+          child: DialogTextField(
+            controller: priceController,
+            hint: 'Price',
+            isItalic: true,
+            isNumber: true,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: DialogTextField(
+            controller: offerPriceController,
+            hint: 'Offer Price',
+            isItalic: true,
+            isNumber: true,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: DialogTextField(
+            controller: taxController,
+            hint: 'Tax %',
+            isItalic: true,
+            isNumber: true,
+            suffixIcon:
+                const Icon(Icons.percent, color: Colors.black54, size: 18),
+          ),
         ),
       ],
     );
   }
+}
 
-  Widget _buildRadioButton(bool selected, String label) {
+class _ApplePricingRow extends StatelessWidget {
+  const _ApplePricingRow({
+    required this.applePriceController,
+    required this.appleOfferPriceController,
+  });
+
+  final TextEditingController applePriceController;
+  final TextEditingController appleOfferPriceController;
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          selected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-          color: selected ? Colors.blue.shade800 : Colors.black87,
-          size: 20,
+        Expanded(
+          child: DialogTextField(
+            controller: applePriceController,
+            hint: 'Apple Price',
+            isItalic: true,
+            isNumber: true,
+          ),
         ),
-        const SizedBox(width: 8),
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        const SizedBox(width: 12),
+        Expanded(
+          child: DialogTextField(
+            controller: appleOfferPriceController,
+            hint: 'Apple Offer Price',
+            isItalic: true,
+            isNumber: true,
+          ),
+        ),
       ],
     );
   }
+}
+
+class _CourseOptionsGrid extends StatelessWidget {
+  const _CourseOptionsGrid({required this.cp});
+  final CourseProvider cp;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(children: [
+          Expanded(
+            child: YesNoRadioRow(
+              label: 'Live Classes?',
+              value: cp.hasLiveClasses,
+              onChanged: cp.toggleLiveClasses,
+            ),
+          ),
+          const SizedBox(width: 24),
+          Expanded(
+            child: YesNoRadioRow(
+              label: 'Study Materials?',
+              value: cp.hasStudyMaterials,
+              onChanged: cp.toggleStudyMaterials,
+            ),
+          ),
+        ]),
+        const SizedBox(height: 14),
+        Row(children: [
+          Expanded(
+            child: YesNoRadioRow(
+              label: 'Available On PC?',
+              value: cp.availableOnPC,
+              onChanged: cp.toggleAvailableOnPC,
+            ),
+          ),
+          const SizedBox(width: 24),
+          Expanded(
+            child: YesNoRadioRow(
+              label: 'Popular Course?',
+              value: cp.isPopular,
+              onChanged: cp.togglePopular,
+            ),
+          ),
+        ]),
+        const SizedBox(height: 14),
+        Row(children: [
+          Expanded(
+            child: YesNoRadioRow(
+              label: 'List on iOS?',
+              value: cp.listOnIOS,
+              onChanged: cp.toggleListOnIOS,
+            ),
+          ),
+          const SizedBox(width: 24),
+          Expanded(
+            child: YesNoRadioRow(
+              label: 'Is Life Long?',
+              value: cp.isLifeLong,
+              onChanged: cp.toggleLifeLong,
+            ),
+          ),
+        ]),
+      ],
+    );
+  }
+}
+
+
+InputDecoration _dropdownDecoration() {
+  return InputDecoration(
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Colors.grey.shade300),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Colors.grey.shade300),
+    ),
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+  );
 }

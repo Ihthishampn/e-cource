@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:e_cource/feature/cource/data/model/add_main_category_model.dart';
+import 'package:e_cource/feature/cource/data/model/course_model.dart';
 import 'package:e_cource/feature/cource/data/use_case/course_category_use_case.dart';
 import 'package:e_cource/general/enums/app_state.dart';
 import 'package:flutter/foundation.dart';
@@ -10,15 +11,23 @@ import 'package:injectable/injectable.dart';
 class CourseFirebaseProvider with ChangeNotifier {
   final CourseCategoryUseCase useCase;
   CourseFirebaseProvider(this.useCase);
+
+  // category state
   AppState addCategoryState = AppState.initial;
   AppState getCategoryState = AppState.initial;
   AppState searchCategoryState = AppState.initial;
+  // category error
   String? addCatgoryerror;
   String? getCatgoryerror;
   String? searchCatgoryerror;
+  // course state
+  AppState addCourseState = AppState.initial;
+  // course error
+  String? addCourseerror;
   // main category list
   List<AddMainCategoryModel> mcList = [];
   List<AddMainCategoryModel> searchList = [];
+  List<CourseModel> courseList = [];
 
   // add category
 
@@ -86,8 +95,30 @@ class CourseFirebaseProvider with ChangeNotifier {
   }
 
   void clearSearch() {
-  searchList.clear();
-  searchCategoryState = AppState.initial;
-  notifyListeners();
-}
+    searchList.clear();
+    searchCategoryState = AppState.initial;
+    notifyListeners();
+  }
+
+  // ------------- course  seccion
+
+  Future<void> handleAddCourse({required CourseModel model,required Uint8List imageFile}) async {
+    if (addCourseState == AppState.loading) return;
+    addCourseState = AppState.loading;
+    addCourseerror = null;
+    notifyListeners();
+    try {
+
+
+      
+      final CourseModel res = await useCase.addCourse(model: model,imageFile: imageFile);
+
+      courseList.add(res);
+      addCourseState = AppState.success;
+    } catch (e) {
+      log("error while add course provider file : $e");
+      addCourseState = AppState.error;
+    }
+    notifyListeners();
+  }
 }

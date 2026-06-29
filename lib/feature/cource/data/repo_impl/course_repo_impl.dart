@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_cource/feature/cource/data/model/add_main_category_model.dart';
+import 'package:e_cource/feature/cource/data/model/course_model.dart';
 import 'package:e_cource/feature/cource/domain/course_repo.dart';
 import 'package:e_cource/general/core/services/upload_firestore_image_services.dart';
 import 'package:e_cource/general/widgets/build_search_keywords.dart';
@@ -19,7 +20,7 @@ class CourseRepoImpl implements CourseRepo {
     required Uint8List imageFile,
   }) async {
     try {
-      final imageUrl = await uplodFirebaseImageService(imageFile);
+      final imageUrl = await uplodFirebaseImageCategoryService(imageFile);
       if (imageUrl == null || imageUrl.isEmpty) {
         throw Exception('Image upload failed');
       }
@@ -78,6 +79,31 @@ class CourseRepoImpl implements CourseRepo {
           .map((e) => AddMainCategoryModel.fromMap(e.data(), e.id))
           .toList();
     } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<CourseModel> addCourse({
+    required CourseModel model,
+    required Uint8List imageFile,
+  }) async {
+    try {
+      final imageUrl = await uplodFirebaseImageCourseService(imageFile);
+      if ( imageUrl == null ||   imageUrl.isEmpty) {
+        throw Exception("image url is empty cant add a course , try again");
+      }
+
+      final DocumentReference<Map<String, dynamic>> doc = firebaseFirestore
+          .collection("main_course")
+          .doc();
+      final newCOurse = model.copyWith(id: doc.id,image: imageUrl);
+
+      await doc.set(newCOurse.toMap());
+
+      return newCOurse;
+    } catch (e) {
+      log("error while add a course :$e");
       rethrow;
     }
   }
