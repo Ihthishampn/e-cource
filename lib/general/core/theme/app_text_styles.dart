@@ -17,8 +17,8 @@ class AppTextStyles {
   );
 
   static final TextStyle heading3 = GoogleFonts.outfit(
-    fontSize: 18,
-    fontWeight: FontWeight.w700,
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
     color: AppColors.textColor,
   );
 
@@ -41,7 +41,7 @@ class AppTextStyles {
     fontWeight: FontWeight.w500,
     color: AppColors.greyShade,
   );
-  
+
   static final TextStyle buttonText = GoogleFonts.outfit(
     fontSize: 16,
     fontWeight: FontWeight.w600,

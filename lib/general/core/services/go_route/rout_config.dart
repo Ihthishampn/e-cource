@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:e_cource/feature/app_route/presentation/side_navigation_screen.dart';
 import 'package:e_cource/feature/auth/presentation/view/login_screen.dart';
+import 'package:e_cource/feature/cource/data/model/course_model.dart';
 import 'package:e_cource/feature/cource/presentation/view/cource_screen.dart';
 import 'package:e_cource/feature/cource/presentation/view/course_details_screen.dart';
 import 'package:e_cource/feature/dashboard/presentation/view/dashbpard_screen.dart';
@@ -16,11 +17,11 @@ import 'package:go_router/go_router.dart';
 
 final _rootNavigatorkey = GlobalKey<NavigatorState>();
 
-CustomTransitionPage<void> _customTransitionPage(Widget child, GoRouterState state) {
-  return NoTransitionPage<void>(
-    key: state.pageKey,
-    child: child,
-  );
+CustomTransitionPage<void> _customTransitionPage(
+  Widget child,
+  GoRouterState state,
+) {
+  return NoTransitionPage<void>(key: state.pageKey, child: child);
 }
 
 final router = GoRouter(
@@ -65,7 +66,8 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: RouteNames.dahsboard,
-              pageBuilder: (context, state) => _customTransitionPage(const DashboardScreen(), state),
+              pageBuilder: (context, state) =>
+                  _customTransitionPage(const DashboardScreen(), state),
             ),
           ],
         ),
@@ -73,7 +75,8 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: RouteNames.students,
-              pageBuilder: (context, state) => _customTransitionPage(const StudentsScreen(), state),
+              pageBuilder: (context, state) =>
+                  _customTransitionPage(const StudentsScreen(), state),
               routes: [
                 GoRoute(
                   path: 'details',
@@ -81,13 +84,15 @@ final router = GoRouter(
                     final extra = state.extra as Map<String, String>?;
                     return _customTransitionPage(
                       StudentDetailsScreen(
-                        studentData: extra ?? {
-                          'name': 'amal dev',
-                          'phone': '+918590941583',
-                          'email': '---',
-                          'joinedAt': '25-06-2026',
-                          'status': 'Enable',
-                        },
+                        studentData:
+                            extra ??
+                            {
+                              'name': 'amal dev',
+                              'phone': '+918590941583',
+                              'email': '---',
+                              'joinedAt': '25-06-2026',
+                              'status': 'Enable',
+                            },
                       ),
                       state,
                     );
@@ -101,11 +106,19 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: RouteNames.cources,
-              pageBuilder: (context, state) => _customTransitionPage(const CourceScreen(), state),
+              pageBuilder: (context, state) =>
+                  _customTransitionPage(const CourceScreen(), state),
               routes: [
                 GoRoute(
                   path: 'details',
-                  pageBuilder: (context, state) => _customTransitionPage(const CourseDetailsScreen(), state),
+                  pageBuilder: (context, state) {
+                    final course = state.extra as CourseModel;
+
+                    return _customTransitionPage(
+                      CourseDetailsScreen(course: course),
+                      state,
+                    );
+                  },
                 ),
               ],
             ),
@@ -115,7 +128,8 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: RouteNames.settings,
-              pageBuilder: (context, state) => _customTransitionPage(const SettingsScreen(), state),
+              pageBuilder: (context, state) =>
+                  _customTransitionPage(const SettingsScreen(), state),
             ),
           ],
         ),

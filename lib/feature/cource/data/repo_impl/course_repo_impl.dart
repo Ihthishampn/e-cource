@@ -90,20 +90,31 @@ class CourseRepoImpl implements CourseRepo {
   }) async {
     try {
       final imageUrl = await uplodFirebaseImageCourseService(imageFile);
-      if ( imageUrl == null ||   imageUrl.isEmpty) {
+      if (imageUrl == null || imageUrl.isEmpty) {
         throw Exception("image url is empty cant add a course , try again");
       }
 
       final DocumentReference<Map<String, dynamic>> doc = firebaseFirestore
           .collection("main_course")
           .doc();
-      final newCOurse = model.copyWith(id: doc.id,image: imageUrl);
+      final newCOurse = model.copyWith(id: doc.id, image: imageUrl);
 
       await doc.set(newCOurse.toMap());
 
       return newCOurse;
     } catch (e) {
       log("error while add a course :$e");
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<CourseModel>> getCourse() async {
+    try {
+      final res = await firebaseFirestore.collection("main_course").get();
+      return res.docs.map((e) => CourseModel.fromMap(e.data(), e.id)).toList();
+    } catch (e) {
+      log("error while fetch courses");
       rethrow;
     }
   }

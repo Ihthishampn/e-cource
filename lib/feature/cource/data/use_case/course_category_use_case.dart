@@ -10,9 +10,9 @@ import 'package:injectable/injectable.dart';
 class CourseCategoryUseCase {
   final CourseRepo repo;
   CourseCategoryUseCase(this.repo);
-// add main category ----------------- //
+  // add main category ----------------- //
 
-//add
+  //add
   Future<AddMainCategoryModel> addMainCategory({
     required String name,
     required Uint8List imageFile,
@@ -24,23 +24,26 @@ class CourseCategoryUseCase {
   Future<List<AddMainCategoryModel>> getCategoryList() async {
     return await repo.getCategoryList();
   }
-// search category
+
+  // search category
   Future<List<AddMainCategoryModel>> searchCategoryList({
     required String q,
   }) async {
     return await repo.searchCategory(query: q);
   }
-//    course seccionn ---------------//  
-// add
-  Future<CourseModel> addCourse({required CourseModel model,required  Uint8List imageFile}) async {
-    return await repo.addCourse(model: model,imageFile: imageFile);
+
+  //    course seccionn ---------------//
+  // add
+  Future<CourseModel> addCourse({
+    required CourseModel model,
+    required Uint8List imageFile,
+  }) async {
+    return await repo.addCourse(model: model, imageFile: imageFile);
   }
-
-
 
   // get
 
-
-
-
+  Future<List<CourseModel>> getCourse() async {
+    return await repo.getCourse();
+  }
 }

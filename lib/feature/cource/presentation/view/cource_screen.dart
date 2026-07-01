@@ -1,25 +1,42 @@
+import 'package:e_cource/feature/cource/presentation/provider/course_firebase_provider.dart';
 import 'package:e_cource/general/widgets/custom_main_header.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/add_course_card.dart';
 import '../widgets/course_action_bar.dart';
 import '../widgets/course_card.dart';
 
-class CourceScreen extends StatelessWidget {
+class CourceScreen extends StatefulWidget {
   const CourceScreen({super.key});
 
   @override
+  State<CourceScreen> createState() => _CourceScreenState();
+}
+
+class _CourceScreenState extends State<CourceScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CourseFirebaseProvider>().handleFetchCourse();
+      
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final provider = context.watch<CourseFirebaseProvider>();
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color.fromARGB(255, 247, 247, 247),
       body: CustomScrollView(
         slivers: [
           const CustomMainHeader(),
-          const SliverToBoxAdapter(
-            child: CourseActionBar(),
-          ),
+          const SliverToBoxAdapter(child: CourseActionBar()),
           SliverPadding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16),
             sliver: SliverGrid(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 5,
@@ -27,24 +44,15 @@ class CourceScreen extends StatelessWidget {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
               ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  if (index == 0) {
-                    return const AddCourseCard();
-                  }
-                  
-                  return const CourseCard(
-                    title: 'Course Consulting',
-                    duration: '0h 0m',
-                    lessons: 0,
-                    category: 'Consulting',
-                    priceType: 'Paid',
-                    price: '₹62,000/-',
-                    imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=600&auto=format&fit=crop',
-                  );
-                },
-                childCount: 6,
-              ),
+              delegate: SliverChildBuilderDelegate((context, index) {
+                if (index == 0) {
+                  return const AddCourseCard();
+                }
+
+                final course = provider.courseList[index - 1];
+
+                return CourseCard(course: course);
+              }, childCount: provider.courseList.length + 1),
             ),
           ),
         ],

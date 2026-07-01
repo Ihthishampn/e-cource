@@ -2,11 +2,16 @@
 import 'package:e_cource/feature/cource/data/model/course_model.dart';
 import 'package:e_cource/feature/cource/presentation/provider/course_firebase_provider.dart';
 import 'package:e_cource/feature/cource/presentation/provider/course_provider.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/apple_pricing_row.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/category_drop_down.dart';
 import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/course_image_picker.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/course_option_grid.dart';
 import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/dilogue_action.dart';
 import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/dilogue_header.dart';
 import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/dilogue_section.dart';
 import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/dilogue_text_field.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/duration_drop_down.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/price_row.dart';
 import 'package:e_cource/feature/cource/presentation/widgets/course_add_widgets/tag_input_section.dart';
 import 'package:e_cource/general/enums/app_state.dart';
 import 'package:e_cource/general/widgets/build_search_keywords.dart';
@@ -15,18 +20,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import 'course_add_widgets/yes_not_widget.dart';
 
 
 
-const List<String> _durations = [
-  '1 Month',
-  '3 Months',
-  '6 Months',
-  '1 Year',
-];
 
-/// Outer wrapper — provides CourseProvider to the subtree.
+
+///  provides CourseProvider to the subtree.
 class AddCourseDialog extends StatelessWidget {
   const AddCourseDialog({super.key});
 
@@ -173,7 +172,7 @@ class _AddCourseDialogBodyState extends State<_AddCourseDialogBody> {
                         required: true,
                         hint: '(Max 5MB – JPG, PNG)',
                         child: CourseImagePicker(
-                          onImagePicked: (bytes, _, __, ___) {
+                          onImagePicked: (bytes, _, _, _) {
                             setState(() => _imageBytes = bytes);
                           },
                         ),
@@ -182,7 +181,7 @@ class _AddCourseDialogBodyState extends State<_AddCourseDialogBody> {
                       DialogSectionRow(
                         label: 'Category',
                         required: true,
-                        child: _CategoryDropdown(cp: cp),
+                        child: CategoryDropdown(cp: cp),
                       ),
                       _divider(),
                       DialogSectionRow(
@@ -215,7 +214,7 @@ class _AddCourseDialogBodyState extends State<_AddCourseDialogBody> {
                       DialogSectionRow(
                         label: 'Pricing',
                         required: true,
-                        child: _PricingRow(
+                        child: PricingRow(
                           priceController: _priceController,
                           offerPriceController: _offerPriceController,
                           taxController: _taxController,
@@ -225,7 +224,7 @@ class _AddCourseDialogBodyState extends State<_AddCourseDialogBody> {
                       DialogSectionRow(
                         label: 'Apple Pricing',
                         required: true,
-                        child: _ApplePricingRow(
+                        child: ApplePricingRow(
                           applePriceController: _applePriceController,
                           appleOfferPriceController: _appleOfferPriceController,
                         ),
@@ -234,7 +233,7 @@ class _AddCourseDialogBodyState extends State<_AddCourseDialogBody> {
                       DialogSectionRow(
                         label: 'Course Duration',
                         required: true,
-                        child: _DurationDropdown(
+                        child: DurationDropdown(
                           selected: _selectedDuration,
                           onChanged: (val) =>
                               setState(() => _selectedDuration = val),
@@ -243,7 +242,7 @@ class _AddCourseDialogBodyState extends State<_AddCourseDialogBody> {
                       _divider(),
                       DialogSectionRow(
                         label: 'Course Options',
-                        child: _CourseOptionsGrid(cp: cp),
+                        child: CourseOptionsGrid(cp: cp),
                       ),
                       const SizedBox(height: 32),
                       Consumer<CourseFirebaseProvider>(
@@ -270,249 +269,7 @@ class _AddCourseDialogBodyState extends State<_AddCourseDialogBody> {
       );
 }
 
-// ── Local-scope small widgets (tightly coupled to this dialog) ────────────────
-
-class _CategoryDropdown extends StatelessWidget {
-  const _CategoryDropdown({required this.cp});
-  final CourseProvider cp;
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<CourseFirebaseProvider>(
-      builder: (context, fp, _) {
-        if (fp.getCategoryState == AppState.loading) {
-          return Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Row(
-              children: [
-                SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                ),
-                SizedBox(width: 12),
-                Text('Loading categories...',
-                    style: TextStyle(color: Colors.grey)),
-              ],
-            ),
-          );
-        }
-
-        final categories = fp.mcList;
-
-        return DropdownButtonFormField<String>(
-          value: cp.selectedCategory?.id,
-          isExpanded: true,
-          hint: Text(
-            'Select Category',
-            style: TextStyle(
-                color: Colors.grey.shade400, fontStyle: FontStyle.italic),
-          ),
-          decoration: _dropdownDecoration(),
-          items: categories
-              .map((c) =>
-                  DropdownMenuItem<String>(value: c.id, child: Text(c.name)))
-              .toList(),
-          onChanged: (id) {
-            if (id == null) return;
-            cp.setSelectedCategory(categories.firstWhere((c) => c.id == id));
-          },
-        );
-      },
-    );
-  }
-}
-
-class _DurationDropdown extends StatelessWidget {
-  const _DurationDropdown({required this.selected, required this.onChanged});
-
-  final String? selected;
-  final ValueChanged<String?> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      value: selected,
-      isExpanded: true,
-      hint: Text(
-        'Select Duration',
-        style: TextStyle(
-            color: Colors.grey.shade400, fontStyle: FontStyle.italic),
-      ),
-      decoration: _dropdownDecoration(),
-      items: _durations
-          .map((d) => DropdownMenuItem(value: d, child: Text(d)))
-          .toList(),
-      onChanged: onChanged,
-    );
-  }
-}
-
-class _PricingRow extends StatelessWidget {
-  const _PricingRow({
-    required this.priceController,
-    required this.offerPriceController,
-    required this.taxController,
-  });
-
-  final TextEditingController priceController;
-  final TextEditingController offerPriceController;
-  final TextEditingController taxController;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: DialogTextField(
-            controller: priceController,
-            hint: 'Price',
-            isItalic: true,
-            isNumber: true,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: DialogTextField(
-            controller: offerPriceController,
-            hint: 'Offer Price',
-            isItalic: true,
-            isNumber: true,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: DialogTextField(
-            controller: taxController,
-            hint: 'Tax %',
-            isItalic: true,
-            isNumber: true,
-            suffixIcon:
-                const Icon(Icons.percent, color: Colors.black54, size: 18),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ApplePricingRow extends StatelessWidget {
-  const _ApplePricingRow({
-    required this.applePriceController,
-    required this.appleOfferPriceController,
-  });
-
-  final TextEditingController applePriceController;
-  final TextEditingController appleOfferPriceController;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: DialogTextField(
-            controller: applePriceController,
-            hint: 'Apple Price',
-            isItalic: true,
-            isNumber: true,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: DialogTextField(
-            controller: appleOfferPriceController,
-            hint: 'Apple Offer Price',
-            isItalic: true,
-            isNumber: true,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _CourseOptionsGrid extends StatelessWidget {
-  const _CourseOptionsGrid({required this.cp});
-  final CourseProvider cp;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(children: [
-          Expanded(
-            child: YesNoRadioRow(
-              label: 'Live Classes?',
-              value: cp.hasLiveClasses,
-              onChanged: cp.toggleLiveClasses,
-            ),
-          ),
-          const SizedBox(width: 24),
-          Expanded(
-            child: YesNoRadioRow(
-              label: 'Study Materials?',
-              value: cp.hasStudyMaterials,
-              onChanged: cp.toggleStudyMaterials,
-            ),
-          ),
-        ]),
-        const SizedBox(height: 14),
-        Row(children: [
-          Expanded(
-            child: YesNoRadioRow(
-              label: 'Available On PC?',
-              value: cp.availableOnPC,
-              onChanged: cp.toggleAvailableOnPC,
-            ),
-          ),
-          const SizedBox(width: 24),
-          Expanded(
-            child: YesNoRadioRow(
-              label: 'Popular Course?',
-              value: cp.isPopular,
-              onChanged: cp.togglePopular,
-            ),
-          ),
-        ]),
-        const SizedBox(height: 14),
-        Row(children: [
-          Expanded(
-            child: YesNoRadioRow(
-              label: 'List on iOS?',
-              value: cp.listOnIOS,
-              onChanged: cp.toggleListOnIOS,
-            ),
-          ),
-          const SizedBox(width: 24),
-          Expanded(
-            child: YesNoRadioRow(
-              label: 'Is Life Long?',
-              value: cp.isLifeLong,
-              onChanged: cp.toggleLifeLong,
-            ),
-          ),
-        ]),
-      ],
-    );
-  }
-}
 
 
-InputDecoration _dropdownDecoration() {
-  return InputDecoration(
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: Colors.grey.shade300),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: Colors.grey.shade300),
-    ),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-  );
-}
+
+

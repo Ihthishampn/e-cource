@@ -10,6 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
+import 'package:dio/dio.dart' as _i361;
 import 'package:e_cource/feature/auth/data/data_source/auth_local_data_source.dart'
     as _i408;
 import 'package:e_cource/feature/auth/data/repo_impl/auth_repo_impl.dart'
@@ -25,6 +26,21 @@ import 'package:e_cource/feature/cource/data/use_case/course_category_use_case.d
 import 'package:e_cource/feature/cource/domain/course_repo.dart' as _i106;
 import 'package:e_cource/feature/cource/presentation/provider/course_firebase_provider.dart'
     as _i342;
+import 'package:e_cource/feature/lesson/data/lesson_repo_impl/lesson_repo_impl.dart'
+    as _i1057;
+import 'package:e_cource/feature/lesson/data/lesson_use_case/lesson_use_case.dart'
+    as _i799;
+import 'package:e_cource/feature/lesson/domain/lesson_repo.dart' as _i529;
+import 'package:e_cource/feature/lesson/presentation/provider/lesson_provider.dart'
+    as _i794;
+import 'package:e_cource/feature/module/data/module_repo_impl/module_repo_impl.dart'
+    as _i612;
+import 'package:e_cource/feature/module/data/module_use_case/module_use_case.dart'
+    as _i967;
+import 'package:e_cource/feature/module/domain/module_repo.dart' as _i824;
+import 'package:e_cource/feature/module/presentation/provider/module_provider.dart'
+    as _i5;
+import 'package:e_cource/general/core/di/module/dio_client.dart' as _i733;
 import 'package:e_cource/general/core/di/module/firebase_module.dart' as _i973;
 import 'package:e_cource/general/core/di/module/local_storage_module.dart'
     as _i63;
@@ -41,11 +57,13 @@ extension GetItInjectableX on _i174.GetIt {
   }) async {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final localStorageModule = _$LocalStorageModule();
+    final dioClient = _$DioClient();
     final firebaseModule = _$FirebaseModule();
     await gh.factoryAsync<_i460.SharedPreferences>(
       () => localStorageModule.prefs,
       preResolve: true,
     );
+    gh.lazySingleton<_i361.Dio>(() => dioClient.dio());
     gh.lazySingleton<_i974.FirebaseFirestore>(
       () => firebaseModule.firebaseFirestore(),
     );
@@ -59,6 +77,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i974.FirebaseFirestore>(),
       ),
     );
+    gh.lazySingleton<_i529.LessonRepo>(
+      () => _i1057.LessonRepoImpl(gh<_i974.FirebaseFirestore>()),
+    );
     gh.lazySingleton<_i408.AuthLocalDataSource>(
       () => _i408.AuthLocalDataSource(gh<_i460.SharedPreferences>()),
     );
@@ -71,13 +92,30 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i408.AuthLocalDataSource>(),
       ),
     );
+    gh.lazySingleton<_i824.ModuleRepo>(
+      () => _i612.ModuleRepoImpl(gh<_i974.FirebaseFirestore>()),
+    );
     gh.factory<_i342.CourseFirebaseProvider>(
       () => _i342.CourseFirebaseProvider(gh<_i903.CourseCategoryUseCase>()),
+    );
+    gh.lazySingleton<_i799.LessonUseCase>(
+      () => _i799.LessonUseCase(gh<_i529.LessonRepo>()),
+    );
+    gh.lazySingleton<_i967.ModuleUseCase>(
+      () => _i967.ModuleUseCase(gh<_i824.ModuleRepo>()),
+    );
+    gh.factory<_i5.ModuleProvider>(
+      () => _i5.ModuleProvider(gh<_i967.ModuleUseCase>()),
+    );
+    gh.factory<_i794.LessonProvider>(
+      () => _i794.LessonProvider(gh<_i799.LessonUseCase>()),
     );
     return this;
   }
 }
 
 class _$LocalStorageModule extends _i63.LocalStorageModule {}
+
+class _$DioClient extends _i733.DioClient {}
 
 class _$FirebaseModule extends _i973.FirebaseModule {}

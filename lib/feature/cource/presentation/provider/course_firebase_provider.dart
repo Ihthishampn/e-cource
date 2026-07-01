@@ -22,8 +22,10 @@ class CourseFirebaseProvider with ChangeNotifier {
   String? searchCatgoryerror;
   // course state
   AppState addCourseState = AppState.initial;
+  AppState fetchCourseState = AppState.initial;
   // course error
   String? addCourseerror;
+  String? fetchCourseerror;
   // main category list
   List<AddMainCategoryModel> mcList = [];
   List<AddMainCategoryModel> searchList = [];
@@ -100,24 +102,53 @@ class CourseFirebaseProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // ------------- course  seccion
+  // ------------- course  seccion -------------------//
 
-  Future<void> handleAddCourse({required CourseModel model,required Uint8List imageFile}) async {
+  // add
+
+  Future<void> handleAddCourse({
+    required CourseModel model,
+    required Uint8List imageFile,
+  }) async {
     if (addCourseState == AppState.loading) return;
     addCourseState = AppState.loading;
     addCourseerror = null;
     notifyListeners();
     try {
-
-
-      
-      final CourseModel res = await useCase.addCourse(model: model,imageFile: imageFile);
+      final CourseModel res = await useCase.addCourse(
+        model: model,
+        imageFile: imageFile,
+      );
 
       courseList.add(res);
       addCourseState = AppState.success;
     } catch (e) {
       log("error while add course provider file : $e");
       addCourseState = AppState.error;
+    }
+    notifyListeners();
+  }
+
+  // get
+
+  Future<void> handleFetchCourse() async {
+    if (fetchCourseState == AppState.loading) return;
+
+    fetchCourseState = AppState.loading;
+
+    fetchCourseerror = null;
+
+    notifyListeners();
+
+    try {
+      courseList.clear();
+      final res = await useCase.getCourse();
+
+      courseList = res;
+    } catch (e) {
+      log("error while get course provider file : $e");
+      addCourseState = AppState.error;
+      fetchCourseerror = e.toString();
     }
     notifyListeners();
   }

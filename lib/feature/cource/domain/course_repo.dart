@@ -19,4 +19,9 @@ abstract class CourseRepo {
 
   // add a course repo start here //
   Future<CourseModel> addCourse({required CourseModel model, required Uint8List imageFile});
+
+
+// get
+    Future<List<CourseModel>> getCourse();
+
 }

@@ -1,3 +1,9 @@
+import 'package:e_cource/feature/cource/data/model/course_model.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/inner_screen_course/cource_exam_widget.dart';
+import 'package:e_cource/feature/lesson/presentation/provider/lesson_provider.dart';
+import 'package:e_cource/feature/module/presentation/provider/module_provider.dart';
+import 'package:e_cource/feature/module/presentation/view/course_contents_widget.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/inner_screen_course/course_live_widget.dart';
 import 'package:e_cource/general/core/theme/app_colors.dart';
 import 'package:e_cource/general/widgets/custom_main_header.dart';
 import 'package:flutter/material.dart';
@@ -6,19 +12,23 @@ import 'package:provider/provider.dart';
 import 'package:e_cource/feature/cource/presentation/provider/course_provider.dart';
 
 class CourseDetailsScreen extends StatelessWidget {
-  const CourseDetailsScreen({super.key});
+  final CourseModel course;
+
+  const CourseDetailsScreen({super.key, required this.course});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => CourseProvider(),
-      child: const _CourseDetailsView(),
+      child: _CourseDetailsView(course: course),
     );
   }
 }
 
 class _CourseDetailsView extends StatelessWidget {
-  const _CourseDetailsView();
+  final CourseModel course;
+
+  const _CourseDetailsView({required this.course});
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +37,6 @@ class _CourseDetailsView extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           const CustomMainHeader(),
-          
-          // Title & Back Button Row
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
             sliver: SliverToBoxAdapter(
@@ -36,44 +44,30 @@ class _CourseDetailsView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Course Details",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF333333),
-                    ),
+                    'Course Details',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   ElevatedButton(
-                    onPressed: () => context.pop(),
+                    onPressed: () {
+                      context.read<ModuleProvider>().clear();
+                      context.read<LessonProvider>().clear();
+                      context.pop();
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 14,
-                      ),
                     ),
                     child: const Text(
-                      "Back",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
+                      'Back',
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          
           const SliverToBoxAdapter(child: Divider(height: 1)),
           SliverFillRemaining(
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildLeftColumn(),
                 const VerticalDivider(width: 1),
@@ -98,7 +92,7 @@ class _CourseDetailsView extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withOpacity(.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -109,34 +103,78 @@ class _CourseDetailsView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.network(
-                  'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=600&auto=format&fit=crop',
+                  course.image,
                   height: 200,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => Container(
+                    height: 200,
+                    color: Colors.grey.shade300,
+                    child: const Icon(Icons.image),
+                  ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Course Consulting',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      Text(
+                        course.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 8),
-                      const Row(
+                      Row(
                         children: [
-                          Icon(Icons.access_time, size: 14, color: Colors.grey),
-                          SizedBox(width: 4),
-                          Text('0h 0m', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                          const Icon(
+                            Icons.access_time,
+                            size: 14,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            course.duration,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
-                      const Align(
+                      Text('Category : ${course.categoryName}'),
+                      const SizedBox(height: 8),
+                      Text('Tutor : ${course.tutor}'),
+                      const SizedBox(height: 8),
+                      Text('Tax : ₹${course.tax}'),
+                      const SizedBox(height: 8),
+                      Text('Apple Price : ₹${course.applePrice}'),
+                      const SizedBox(height: 8),
+                      Text('Apple Offer Price : ₹${course.appleOfferPrice}'),
+                      const SizedBox(height: 16),
+                      Align(
                         alignment: Alignment.centerRight,
-                        child: Text(
-                          '62000/-',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              '₹${course.price}',
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            if (course.offerPrice > 0)
+                              Text(
+                                'Offer ₹${course.offerPrice}',
+                                style: const TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -146,12 +184,11 @@ class _CourseDetailsView extends StatelessWidget {
                           onPressed: () {},
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.buttonBlue,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
                           ),
-                          child: const Text('Update And Edit', style: TextStyle(color: Colors.white)),
+                          child: const Text(
+                            'Update And Edit',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
                     ],
@@ -161,42 +198,29 @@ class _CourseDetailsView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Course Details',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          const Text('Features', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          _feature('Live Classes', course.hasLiveClasses),
+          _feature('Study Materials', course.hasStudyMaterials),
+          _feature('Available On PC', course.availableOnPC),
+          _feature('Popular', course.isPopular),
+          _feature('List On IOS', course.listOnIOS),
+          _feature('Life Long Access', course.isLifeLong),
+          const SizedBox(height: 24),
+          const Text('Tags', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: course.tags.map((e) => Chip(label: Text(e))).toList(),
           ),
-          const SizedBox(height: 16),
-          Align(
-            alignment: Alignment.center,
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text('Add', style: TextStyle(color: Colors.white)),
-            ),
-          ),
-          const SizedBox(height: 32),
-          const Text(
-            'Main Points',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          Align(
-            alignment: Alignment.center,
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text('Add', style: TextStyle(color: Colors.white)),
-            ),
+          const SizedBox(height: 24),
+          const Text('Keywords', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: course.keywords.map((e) => Chip(label: Text(e))).toList(),
           ),
         ],
       ),
@@ -222,30 +246,13 @@ class _CourseDetailsView extends StatelessWidget {
                     _buildTab(context, 'Exam', 2),
                   ],
                 ),
-                ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.add, size: 16, color: Colors.white),
-                  label: const Text('Add New Module', style: TextStyle(color: Colors.white)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.buttonBlue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                ),
               ],
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Modules',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
             Expanded(
-              child: Center(
-                child: Text(
-                  'No File Available',
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
+              child: _buildSelectedScreen(
+                context: context,
+                courseId: course.id,
               ),
             ),
           ],
@@ -255,8 +262,8 @@ class _CourseDetailsView extends StatelessWidget {
   }
 
   Widget _buildTab(BuildContext context, String title, int index) {
-    final selectedTabIndex = context.watch<CourseProvider>().selectedTabIndex;
-    final isSelected = selectedTabIndex == index;
+    final selected = context.watch<CourseProvider>().selectedTabIndex == index;
+
     return GestureDetector(
       onTap: () {
         context.read<CourseProvider>().setTabIndex(index);
@@ -264,7 +271,9 @@ class _CourseDetailsView extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryColor : AppColors.primaryColor.withOpacity(0.5),
+          color: selected
+              ? AppColors.primaryColor
+              : AppColors.primaryColor.withOpacity(.5),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
@@ -276,5 +285,42 @@ class _CourseDetailsView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _feature(String title, bool value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(
+            value ? Icons.check_circle : Icons.cancel,
+            color: value ? Colors.green : Colors.red,
+          ),
+          const SizedBox(width: 8),
+          Text(title),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSelectedScreen({
+    required BuildContext context,
+    required String courseId,
+  }) {
+    final tab = context.watch<CourseProvider>().selectedTabIndex;
+
+    switch (tab) {
+      case 0:
+        return CourseContentsWidget(courseId: courseId);
+
+      case 1:
+        return const CourseLiveWidget();
+
+      case 2:
+        return const CourseExamWidget();
+
+      default:
+        return const SizedBox();
+    }
   }
 }
