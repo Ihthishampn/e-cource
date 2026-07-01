@@ -13,11 +13,7 @@ class LessonRepoImpl implements LessonRepo {
   @override
   Future<LessonModel> addLesson({required LessonModel model}) async {
     try {
-
       // take bunny vdo here and erturn needed things...
-
-
-
 
       // .....................//
       final DocumentReference doc = firebaseFirestore
@@ -36,21 +32,52 @@ class LessonRepoImpl implements LessonRepo {
     }
   }
 
-@override
-Future<List<LessonModel>> getLesson(String courseId) async {
-  try {
-    final res = await firebaseFirestore
-        .collection("lessons")
-        .where("courseId", isEqualTo: courseId)
-        .orderBy("createdAt")
-        .get();
+  @override
+  Future<List<LessonModel>> getLesson(String courseId) async {
+    try {
+      final res = await firebaseFirestore
+          .collection("lessons")
+          .where("courseId", isEqualTo: courseId)
+          .orderBy("createdAt")
+          .get();
 
-    return res.docs
-        .map((e) => LessonModel.fromMap(e.data(), e.id))
-        .toList();
+      return res.docs.map((e) => LessonModel.fromMap(e.data(), e.id)).toList();
+    } catch (e) {
+      log("error while get lessons $e");
+      rethrow;
+    }
+  }@override
+Future<bool> changeIspreView({
+  required bool val,
+  required String lesssonId,
+  required String videoId,
+}) async {
+  try {
+    final docRef =
+        firebaseFirestore.collection("lessons").doc(lesssonId);
+
+    final snapshot = await docRef.get();
+
+    if (!snapshot.exists) return false;
+
+    final data = snapshot.data()!;
+    final lesson = LessonModel.fromMap(data, snapshot.id);
+
+    final updatedVideos = lesson.videos.map((video) {
+      if (video.videoId == videoId) {
+        return video.copyWith(isPreview: val);
+      }
+      return video;
+    }).toList();
+
+    await docRef.update({
+      "videos": updatedVideos.map((e) => e.toMap()).toList(),
+    });
+
+    return true;
   } catch (e) {
-    log("error while get lessons $e");
-    rethrow;
+    log("error: $e");
+    return false;
   }
 }
 }

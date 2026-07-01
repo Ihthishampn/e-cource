@@ -1,6 +1,7 @@
 import 'package:e_cource/feature/lesson/data/model/lesson_model.dart';
 import 'package:e_cource/feature/lesson/domain/lesson_repo.dart';
 import 'package:injectable/injectable.dart';
+
 @lazySingleton
 class LessonUseCase {
   final LessonRepo repo;
@@ -9,9 +10,16 @@ class LessonUseCase {
   Future<LessonModel> addLesson({required LessonModel model}) async {
     return await repo.addLesson(model: model);
   }
-Future<List<LessonModel>> getLesson(String courseId) async {
-  return repo.getLesson(courseId);
-}
-}
 
+  Future<List<LessonModel>> getLesson(String courseId) async {
+    return repo.getLesson(courseId);
+  }
 
+  Future<bool> changeIsPreviewUsecase({
+  required bool val, 
+  required String lesssonId, 
+  required String videoId,
+}) async {
+    return await repo.changeIspreView(val: val, lesssonId: lesssonId, videoId: videoId);
+  }
+}

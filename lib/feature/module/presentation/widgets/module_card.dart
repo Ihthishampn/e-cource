@@ -142,7 +142,17 @@ class ModuleCard extends StatelessWidget {
                   lesson: lesson,
                   onDelete: () {},
                   onEdit: () {},
-                  onEnableChanged: (value) {},
+                  onEnableChanged: (value) {
+  final video = lesson.videos.isNotEmpty ? lesson.videos.first : null;
+
+  if (video == null) return;
+
+  context.read<LessonProvider>().handleUpdatePreview(
+    val: value,
+    lessonId: lesson.lessonId,
+    videoId: video.videoId,
+  );
+},
                 ),
               );
             }).toList(),

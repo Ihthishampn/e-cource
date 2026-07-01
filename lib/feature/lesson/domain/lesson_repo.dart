@@ -4,4 +4,10 @@ abstract class LessonRepo {
   Future<LessonModel> addLesson({required LessonModel model});
 
   Future<List<LessonModel>> getLesson(String courseId);
+
+  Future<bool> changeIspreView({
+  required bool val, 
+  required String lesssonId, 
+  required String videoId,
+});
 }

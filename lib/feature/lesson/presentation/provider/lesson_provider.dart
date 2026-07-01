@@ -11,7 +11,8 @@ class LessonProvider with ChangeNotifier {
   final LessonUseCase useCase;
   LessonProvider(this.useCase);
   AppState addLessonState = AppState.initial;
-
+  AppState updatePreviewState = AppState.initial;
+  String? updatePreviewError;
   String? addLessonError;
 
   List<LessonModel> lessonList = [];
@@ -61,8 +62,52 @@ class LessonProvider with ChangeNotifier {
   }
 
   void clear() {
-  lessonList.clear();
-  getLessonState = AppState.initial; 
+    lessonList.clear();
+    getLessonState = AppState.initial;
+    notifyListeners();
+  }
+
+Future<bool> handleUpdatePreview({
+  required bool val,
+  required String lessonId,
+  required String videoId,
+}) async {
+  final lessonIndex = lessonList.indexWhere((l) => l.lessonId == lessonId);
+
+  if (lessonIndex == -1) return false;
+
+  final oldLesson = lessonList[lessonIndex];
+
+  final updatedVideos = oldLesson.videos.map((v) {
+    if (v.videoId == videoId) {
+      return v.copyWith(isPreview: val);
+    }
+    return v;
+  }).toList();
+
+  lessonList[lessonIndex] = oldLesson.copyWith(videos: updatedVideos);
   notifyListeners();
+
+  try {
+    final success = await useCase.changeIsPreviewUsecase(
+      val: val,
+      lesssonId: lessonId,
+      videoId: videoId,
+    );
+
+    if (!success) {
+      lessonList[lessonIndex] = oldLesson;
+      notifyListeners();
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    lessonList[lessonIndex] = oldLesson;
+    notifyListeners();
+
+    log("error from change preview provider: $e");
+    return false;
+  }
 }
 }
