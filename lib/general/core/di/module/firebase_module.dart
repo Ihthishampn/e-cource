@@ -7,14 +7,12 @@ import 'package:injectable/injectable.dart';
 abstract class FirebaseModule {
   
 
-  // database
   @lazySingleton
   FirebaseFirestore firebaseFirestore() => FirebaseFirestore.instanceFor(
     app: Firebase.app(),
     databaseId: "ihthishamecource",
   );
 
-  // auth
   @lazySingleton
   FirebaseAuth firebaseAuth() => FirebaseAuth.instance;
 }

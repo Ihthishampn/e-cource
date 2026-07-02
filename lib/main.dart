@@ -6,6 +6,7 @@ import 'package:e_cource/feature/cource/presentation/provider/course_firebase_pr
 import 'package:e_cource/feature/cource/presentation/provider/course_provider.dart';
 import 'package:e_cource/feature/lesson/presentation/provider/lesson_provider.dart';
 import 'package:e_cource/feature/module/presentation/provider/module_provider.dart';
+import 'package:e_cource/feature/settings/presentation/provider/settings_provider.dart';
 import 'package:e_cource/feature/settings/presentation/provider/settings_tab_provider.dart';
 import 'package:e_cource/firebase_options.dart';
 import 'package:e_cource/general/core/di/injection/injection_config.dart';
@@ -19,7 +20,6 @@ import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// Cache the text theme once at app level
 final _cachedTextTheme = GoogleFonts.outfitTextTheme();
 
 void main() async {
@@ -44,6 +44,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => sl<AuthProviders>()),
         ChangeNotifierProvider(create: (context) => sl<CourseFirebaseProvider>()),
         ChangeNotifierProvider(create: (context) => sl<ModuleProvider>()),
+        ChangeNotifierProvider(create: (context) => sl<SettingsProvider>()),
         ChangeNotifierProvider(create: (context) => sl<LessonProvider>()),
         ChangeNotifierProvider(create: (context) => SettingsTabProvider()),
         ChangeNotifierProvider(create: (context) => CourseProvider()),

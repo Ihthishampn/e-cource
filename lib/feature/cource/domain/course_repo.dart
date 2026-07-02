@@ -15,13 +15,16 @@ abstract class CourseRepo {
   // search
   Future<List<AddMainCategoryModel>> searchCategory({required String query});
 
-
-
   // add a course repo start here //
-  Future<CourseModel> addCourse({required CourseModel model, required Uint8List imageFile});
+  Future<CourseModel> addCourse({
+    required CourseModel model,
+    required Uint8List imageFile,
+  });
 
+  // get
+  Future<List<CourseModel>> getCourse();
 
-// get
-    Future<List<CourseModel>> getCourse();
+  // search a course
 
+  Future<List<CourseModel>> searchCourse({required String query});
 }

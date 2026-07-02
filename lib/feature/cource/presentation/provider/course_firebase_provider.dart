@@ -30,7 +30,37 @@ class CourseFirebaseProvider with ChangeNotifier {
   List<AddMainCategoryModel> mcList = [];
   List<AddMainCategoryModel> searchList = [];
   List<CourseModel> courseList = [];
+  List<CourseModel> searchCourseList = [];
 
+  // search course
+  String searchQuery = "";
+  AppState searchCourseState = AppState.initial;
+  Future<void> handleSearchcourse({required String query}) async {
+    searchQuery = query.trim();
+
+    if (searchQuery.isEmpty) {
+      searchCourseList.clear();
+      searchCourseState = AppState.initial;
+      notifyListeners();
+      return;
+    }
+
+    searchCourseState = AppState.loading;
+    notifyListeners();
+
+    try {
+      searchCourseList = await useCase.searchCOurse(
+        query: searchQuery.toLowerCase(),
+      );
+
+      searchCourseState = AppState.success;
+    } catch (e) {
+      searchCourseList.clear();
+      searchCourseState = AppState.error;
+    }
+
+    notifyListeners();
+  }
   // add category
 
   Future<void> handleAddCatrgory({
@@ -57,6 +87,7 @@ class CourseFirebaseProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
 
   // get
 

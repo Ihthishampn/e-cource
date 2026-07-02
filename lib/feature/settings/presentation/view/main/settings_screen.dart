@@ -7,7 +7,6 @@ import 'package:e_cource/feature/settings/presentation/view/payement_option_scre
 import 'package:e_cource/feature/settings/presentation/view/privacy_policy_screen.dart';
 import 'package:e_cource/feature/settings/presentation/view/terms_contition__screen.dart';
 import 'package:e_cource/feature/settings/presentation/view/time_slot_screen.dart';
-
 import 'package:e_cource/feature/settings/presentation/widgets/selection_Item_settings.dart';
 import 'package:e_cource/general/core/theme/app_colors.dart';
 import 'package:e_cource/general/widgets/custom_main_header.dart';
@@ -23,65 +22,23 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  ScrollController scrollController = ScrollController();
-  final TextEditingController termsHeadercontroller = TextEditingController();
-  final TextEditingController termsDescriptionHeadercontroller =
-      TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
-  final TextEditingController helpWpNUmberController = TextEditingController();
-  final TextEditingController helpEmailController = TextEditingController();
-  final TextEditingController helpContactController = TextEditingController();
-  final TextEditingController privacyHeaderController = TextEditingController();
-  final TextEditingController privacyDescriptionController =
-      TextEditingController();
-
-  late final List<Widget> list = [
-    PrivacyPolicyScreen(
-      privacyHeaderController: privacyHeaderController,
-      privacyDescriptionController: privacyDescriptionController,
-    ),
-
-    //2
-    HelpAndSupportScreen(
-      helpWpNUmberController: helpWpNUmberController,
-      helpEmailController: helpEmailController,
-      helpContactController: helpContactController,
-    ),
-
-    //3
-    TermsAndContition(
-      headerController: termsHeadercontroller,
-      descriptionController: termsDescriptionHeadercontroller,
-    ),
-
-    //4
+  // Sub-screens manage their own controller states. Keep this list final.
+  late final List<Widget> _screens = const [
+    PrivacyPolicyScreen(),
+    HelpAndSupportScreen(),
+    TermsAndConditionScreen(), // Fixed the class constructor call here
     ManageUserScreen(),
-
-    //5
     BunnyVdoScreen(),
-
-    //6
     PayementOptionScreen(),
-
-    //7
     LiveSettingsScreen(),
-
-    //8
     TimeSlotScreen(),
   ];
 
   @override
   void dispose() {
-    scrollController.dispose();
-    termsDescriptionHeadercontroller.dispose();
-    termsHeadercontroller.dispose();
-    helpContactController.dispose();
-    privacyHeaderController.dispose();
-    privacyDescriptionController.dispose();
-    helpContactController.dispose();
-    helpEmailController.dispose();
-
-
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -89,39 +46,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
-        controller: scrollController,
+        controller: _scrollController,
         slivers: [
           const CustomMainHeader(),
-
-          // ------------------ // --------------------- //
           SliverFillRemaining(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: Row(
                 children: [
+                  // Left Side Navigation Panel
                   SizedBox(
                     width: 180,
-
                     child: Column(
                       children: [
-                        Text(
+                        const Text(
                           'Settings',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-
-                        Gap(18),
-
+                        const Gap(18),
                         Expanded(
                           child: Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              border: Border.all(
-                                width: 0.5,
-                                color: Colors.transparent,
-                              ),
                               borderRadius: BorderRadius.circular(12),
                               color: const Color.fromARGB(255, 255, 255, 255),
                             ),
@@ -140,89 +89,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   Expanded(
                                     child: SingleChildScrollView(
                                       child: Consumer<SettingsTabProvider>(
-                                        builder: (context, value, child) =>
-                                            Column(
-                                              children: [
-                                                SelectionItemSettings(
-                                                  text: "Privacy Policy",
-                                                  ontap: () {
-                                                    value.changeIndexSettings(
-                                                      0,
-                                                    );
-                                                  },
-                                                  color: value.selctedIndex == 0 ? Colors.black : Colors.grey,
-                                                ),
-                                                SelectionItemSettings(
-                                                  text: "Help & Support",
-                                                  ontap: () {
-                                                    value.changeIndexSettings(
-                                                      1,
-                                                    );
-                                                  },
-                                                  color: value.selctedIndex == 1 ? Colors.black : Colors.grey,
-                                                ),
-                                                SelectionItemSettings(
-                                                  text: "Terms And\nCondition",
-                                                  ontap: () {
-                                                    value.changeIndexSettings(
-                                                      2,
-                                                    );
-                                                  },
-                                                  color: value.selctedIndex == 2 ? Colors.black : Colors.grey,
-                                                ),
-                                                SelectionItemSettings(
-                                                  text: "Manage Users",
-                                                  ontap: () {
-                                                    value.changeIndexSettings(
-                                                      3,
-                                                    );
-                                                  },
-                                                  color: value.selctedIndex == 3 ? Colors.black : Colors.grey,
-                                                ),
-                                                SelectionItemSettings(
-                                                  text: "Bunny Video",
-                                                  ontap: () {
-                                                    value.changeIndexSettings(
-                                                      4,
-                                                    );
-                                                  },
-                                                  color: value.selctedIndex == 4 ? Colors.black : Colors.grey,
-                                                ),
-                                                SelectionItemSettings(
-                                                  text: "Payment Options",
-                                                  ontap: () {
-                                                    value.changeIndexSettings(
-                                                      5,
-                                                    );
-                                                  },
-                                                  color: value.selctedIndex == 5 ? Colors.black : Colors.grey,
-                                                ),
-                                                SelectionItemSettings(
-                                                  text: "Live Settings",
-                                                  ontap: () {
-                                                    value.changeIndexSettings(
-                                                      6,
-                                                    );
-                                                  },
-                                                  color: value.selctedIndex == 6 ? Colors.black : Colors.grey,
-                                                ),
-                                                SelectionItemSettings(
-                                                  text: "Time Slot",
-                                                  ontap: () {
-                                                    value.changeIndexSettings(
-                                                      7,
-                                                    );
-                                                  },
-                                                  color: value.selctedIndex == 7 ? Colors.black : Colors.grey,
-                                                ),
-                                              ],
+                                        builder: (context, tabs, child) => Column(
+                                          children: [
+                                            SelectionItemSettings(
+                                              text: "Privacy Policy",
+                                              ontap: () => tabs.changeIndexSettings(0),
+                                              color: tabs.selctedIndex == 0 ? Colors.black : Colors.grey,
                                             ),
+                                            SelectionItemSettings(
+                                              text: "Help & Support",
+                                              ontap: () => tabs.changeIndexSettings(1),
+                                              color: tabs.selctedIndex == 1 ? Colors.black : Colors.grey,
+                                            ),
+                                            SelectionItemSettings(
+                                              text: "Terms And\nCondition",
+                                              ontap: () => tabs.changeIndexSettings(2),
+                                              color: tabs.selctedIndex == 2 ? Colors.black : Colors.grey,
+                                            ),
+                                            SelectionItemSettings(
+                                              text: "Manage Users",
+                                              ontap: () => tabs.changeIndexSettings(3),
+                                              color: tabs.selctedIndex == 3 ? Colors.black : Colors.grey,
+                                            ),
+                                            SelectionItemSettings(
+                                              text: "Bunny Video",
+                                              ontap: () => tabs.changeIndexSettings(4),
+                                              color: tabs.selctedIndex == 4 ? Colors.black : Colors.grey,
+                                            ),
+                                            SelectionItemSettings(
+                                              text: "Payment Options",
+                                              ontap: () => tabs.changeIndexSettings(5),
+                                              color: tabs.selctedIndex == 5 ? Colors.black : Colors.grey,
+                                            ),
+                                            SelectionItemSettings(
+                                              text: "Live Settings",
+                                              ontap: () => tabs.changeIndexSettings(6),
+                                              color: tabs.selctedIndex == 6 ? Colors.black : Colors.grey,
+                                            ),
+                                            SelectionItemSettings(
+                                              text: "Time Slot",
+                                              ontap: () => tabs.changeIndexSettings(7),
+                                              color: tabs.selctedIndex == 7 ? Colors.black : Colors.grey,
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-
                                   const SizedBox(height: 20),
-
                                   InkWell(
                                     onTap: () {},
                                     child: Container(
@@ -232,8 +146,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             'Log Out',
@@ -260,14 +173,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ],
                     ),
                   ),
-
-                  //   2 nd screen
+                  // Display Selected View Screen
                   Expanded(
                     child: Consumer<SettingsTabProvider>(
                       builder: (context, provider, child) {
                         return IndexedStack(
                           index: provider.selctedIndex,
-                          children: list,
+                          children: _screens,
                         );
                       },
                     ),

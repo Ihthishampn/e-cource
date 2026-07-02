@@ -118,4 +118,19 @@ class CourseRepoImpl implements CourseRepo {
       rethrow;
     }
   }
+
+  @override
+  Future<List<CourseModel>> searchCourse({required String query}) async {
+    try {
+      final res = await firebaseFirestore
+          .collection("main_course")
+          .where("keywords", arrayContains: query)
+          .get();
+
+      return res.docs.map((e) => CourseModel.fromMap(e.data(), e.id)).toList();
+    } catch (e) {
+      log("error while fetch courses");
+      rethrow;
+    }
+  }
 }

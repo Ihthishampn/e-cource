@@ -6,20 +6,14 @@ import 'package:go_router/go_router.dart';
 class CourseCard extends StatelessWidget {
   final CourseModel course;
 
-  const CourseCard({
-    super.key,
-    required this.course,
-  });
+  const CourseCard({super.key, required this.course});
 
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(
       child: GestureDetector(
-        onTap: () { 
-          context.push(
-            RouteNames.courseDetails,
-            extra: course,
-          );
+        onTap: () {
+          context.push(RouteNames.courseDetails, extra: course);
         },
         child: Container(
           decoration: BoxDecoration(
@@ -27,7 +21,7 @@ class CourseCard extends StatelessWidget {
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(.05),
+                color: Colors.black.withValues(alpha: .05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -40,7 +34,7 @@ class CourseCard extends StatelessWidget {
               Image.network(
                 course.image,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) {
+                errorBuilder: (_, _, _) {
                   return Container(
                     color: Colors.grey.shade300,
                     child: const Icon(Icons.image_not_supported),
@@ -52,10 +46,7 @@ class CourseCard extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(.9),
-                    ],
+                    colors: [Colors.transparent, Colors.black.withValues(alpha: .9)],
                     stops: const [0.4, 1],
                   ),
                 ),
@@ -97,10 +88,7 @@ class CourseCard extends StatelessWidget {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        _buildTag(
-                          course.categoryName,
-                          Colors.teal,
-                        ),
+                        _buildTag(course.categoryName, Colors.teal),
                         const SizedBox(width: 4),
                         _buildTag(
                           course.price == 0 ? 'Free' : 'Paid',
@@ -122,7 +110,42 @@ class CourseCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: () {},
+                            onPressed: () {
+    //                           showDialog(
+    //                             context: context,
+    //                             builder: (context) {
+    //                               return AlertDialog(
+
+
+
+    // title: const Text("Delete Course"),
+    //  content: Text(
+    //   "Are you sure you want to delete '${course.name}'?\n\nThis action cannot be undone.",
+    // ),
+
+    // actions: [
+    //   TextButton(
+    //     onPressed: () => Navigator.pop(context),
+    //     child: const Text("Cancel"),
+    //   ),
+    //   FilledButton(
+    //     style: FilledButton.styleFrom(
+    //       backgroundColor: Colors.red,
+    //     ),
+    //     onPressed: () async {
+    //       Navigator.pop(context);
+
+    //       await context.read<CourseFirebaseProvider>()
+    //           .handleDeleteCourse(course);
+    //     },
+    //     child: const Text("Delete"),
+    //   ),
+    // ],
+
+                              //     );
+                              //   },
+                              // );
+                            },
                             icon: const Icon(
                               Icons.delete_outline,
                               color: Colors.red,
@@ -169,10 +192,7 @@ class CourseCard extends StatelessWidget {
 
   Widget _buildTag(String text, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 6,
-        vertical: 3,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(4),

@@ -1,4 +1,6 @@
+import 'package:e_cource/feature/cource/presentation/provider/course_firebase_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../general/core/theme/app_colors.dart';
 import 'add_category_widgets/add_main_category_dialog.dart';
 
@@ -44,8 +46,12 @@ class CourseActionBar extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search..',
+  onChanged: (value) {
+    context.read<CourseFirebaseProvider>()
+        .handleSearchcourse(query: value);
+  },
+  decoration: InputDecoration(
+    hintText: 'Search...',
                     prefixIcon: const Icon(Icons.search, color: Colors.grey),
                     filled: true,
                     fillColor: AppColors.bgGrey,

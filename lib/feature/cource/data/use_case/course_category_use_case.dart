@@ -46,4 +46,10 @@ class CourseCategoryUseCase {
   Future<List<CourseModel>> getCourse() async {
     return await repo.getCourse();
   }
+
+  // course search
+
+  Future<List<CourseModel>> searchCOurse({required String query}) async {
+    return await repo.searchCourse(query: query);
+  }
 }

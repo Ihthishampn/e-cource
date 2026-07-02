@@ -40,8 +40,16 @@ import 'package:e_cource/feature/module/data/module_use_case/module_use_case.dar
 import 'package:e_cource/feature/module/domain/module_repo.dart' as _i824;
 import 'package:e_cource/feature/module/presentation/provider/module_provider.dart'
     as _i5;
+import 'package:e_cource/feature/settings/data/repo_impl/settings_repo_impl.dart'
+    as _i86;
+import 'package:e_cource/feature/settings/data/use_case/settings_use_case.dart'
+    as _i1069;
+import 'package:e_cource/feature/settings/domain/repo/settings_repo.dart'
+    as _i973;
+import 'package:e_cource/feature/settings/presentation/provider/settings_provider.dart'
+    as _i116;
 import 'package:e_cource/general/core/di/module/dio_client.dart' as _i733;
-import 'package:e_cource/general/core/di/module/firebase_module.dart' as _i973;
+import 'package:e_cource/general/core/di/module/firebase_module.dart' as _i975;
 import 'package:e_cource/general/core/di/module/local_storage_module.dart'
     as _i63;
 import 'package:firebase_auth/firebase_auth.dart' as _i59;
@@ -70,6 +78,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i59.FirebaseAuth>(() => firebaseModule.firebaseAuth());
     gh.lazySingleton<_i106.CourseRepo>(
       () => _i618.CourseRepoImpl(gh<_i974.FirebaseFirestore>()),
+    );
+    gh.lazySingleton<_i973.SettingsRepo>(
+      () => _i86.SettingsRepoImpl(gh<_i974.FirebaseFirestore>()),
     );
     gh.lazySingleton<_i292.AuthRepo>(
       () => _i632.AuthRepoImpl(
@@ -101,6 +112,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i799.LessonUseCase>(
       () => _i799.LessonUseCase(gh<_i529.LessonRepo>()),
     );
+    gh.lazySingleton<_i1069.SettingsUseCase>(
+      () => _i1069.SettingsUseCase(gh<_i973.SettingsRepo>()),
+    );
     gh.lazySingleton<_i967.ModuleUseCase>(
       () => _i967.ModuleUseCase(gh<_i824.ModuleRepo>()),
     );
@@ -110,6 +124,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i794.LessonProvider>(
       () => _i794.LessonProvider(gh<_i799.LessonUseCase>()),
     );
+    gh.factory<_i116.SettingsProvider>(
+      () => _i116.SettingsProvider(gh<_i1069.SettingsUseCase>()),
+    );
     return this;
   }
 }
@@ -118,4 +135,4 @@ class _$LocalStorageModule extends _i63.LocalStorageModule {}
 
 class _$DioClient extends _i733.DioClient {}
 
-class _$FirebaseModule extends _i973.FirebaseModule {}
+class _$FirebaseModule extends _i975.FirebaseModule {}

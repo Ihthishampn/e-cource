@@ -9,7 +9,8 @@ class CustomLabelTextField extends StatelessWidget {
     this.horizontalPadding = 16,
     this.verticalPadding = 14,
     this.minLines = 1,
-    this.maxLines = 1,
+    this.maxLines = 1, 
+    required this.hintText, // Kept exactly as your required positional/named configuration
   });
 
   final String name;
@@ -19,6 +20,7 @@ class CustomLabelTextField extends StatelessWidget {
   final double verticalPadding;
   final int minLines;
   final int maxLines;
+  final String hintText; // Added the hint text variable
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +53,12 @@ class CustomLabelTextField extends StatelessWidget {
           maxLines: maxLines,
           textAlignVertical: TextAlignVertical.top,
           decoration: InputDecoration(
+            hintText: hintText, // Added hintText configuration here
+            hintStyle: const TextStyle(
+              color: Color(0xFF9E9E9E),
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
             filled: true,
             fillColor: const Color(0xFFF1F1F1),
             border: OutlineInputBorder(
