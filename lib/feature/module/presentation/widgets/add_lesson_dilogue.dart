@@ -71,7 +71,6 @@ class _AddLessonDialogState extends State<AddLessonDialog> {
       }
     } else {
       duration = int.tryParse(minutesText) ?? 0;
-      // If it's just a number, we assume it's minutes (for backwards compatibility if they typed it manually)
       duration = duration * 60;
     }
 
