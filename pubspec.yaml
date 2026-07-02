@@ -33,9 +33,12 @@ dependencies:
   fl_chart: ^0.69.0
   firebase_storage: ^13.4.3
   file_picker: ^11.0.2
+  universal_html: ^2.2.4
   cached_network_image: ^3.4.1
   flutter_spinkit: ^5.2.2
   dio: ^5.10.0
+  video_player: ^2.6.0
+  http_parser: ^4.0.0
 
 dev_dependencies:
   flutter_test:

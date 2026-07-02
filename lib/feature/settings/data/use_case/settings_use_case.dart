@@ -7,7 +7,7 @@ class SettingsUseCase {
 
   SettingsUseCase(this.repo);
 
-  // ---------------- Privacy Policy ----------------
+  //  Privacy Policy 
 
   Future<void> privacyUpdate({
     required String header,
@@ -20,7 +20,7 @@ class SettingsUseCase {
     return repo.privacyGet();
   }
 
-  // ---------------- Terms & Conditions ----------------
+  //  Terms & Conditions 
 
   Future<void> termsAndConditionUpdate({
     required String header,

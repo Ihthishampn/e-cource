@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:typed_data';
 
 import 'package:e_cource/feature/lesson/data/lesson_use_case/lesson_use_case.dart';
 import 'package:e_cource/feature/lesson/data/model/lesson_model.dart';
@@ -14,20 +15,43 @@ class LessonProvider with ChangeNotifier {
   AppState updatePreviewState = AppState.initial;
   String? updatePreviewError;
   String? addLessonError;
+  double uploadProgress = 0.0;
 
   List<LessonModel> lessonList = [];
 
-  Future<void> handleAddLesson(LessonModel model) async {
+  Future<void> handleAddLesson(
+    LessonModel model, {
+    Uint8List? videoBytes,
+    String? fileName,
+  }) async {
     if (addLessonState == AppState.loading) return;
     addLessonState = AppState.loading;
     addLessonError = null;
+    uploadProgress = 0.0;
     notifyListeners();
+    log(
+      '[LessonProvider] handleAddLesson: starting upload for lesson="${model.lessonTitle}"',
+    );
 
     try {
-      final res = await useCase.addLesson(model: model);
+      final res = await useCase.addLesson(
+        model: model,
+        videoBytes: videoBytes,
+        fileName: fileName,
+        onProgress: (progress) {
+          uploadProgress = progress;
+          log(
+            '[LessonProvider] upload progress: ${(progress * 100).toStringAsFixed(1)}%',
+          );
+          notifyListeners();
+        },
+      );
 
       lessonList.add(res);
 
+      log(
+        '[LessonProvider] handleAddLesson: upload succeeded, lesson id=${res.lessonId}',
+      );
       addLessonState = AppState.success;
     } catch (e) {
       log(
@@ -67,47 +91,47 @@ class LessonProvider with ChangeNotifier {
     notifyListeners();
   }
 
-Future<bool> handleUpdatePreview({
-  required bool val,
-  required String lessonId,
-  required String videoId,
-}) async {
-  final lessonIndex = lessonList.indexWhere((l) => l.lessonId == lessonId);
+  Future<bool> handleUpdatePreview({
+    required bool val,
+    required String lessonId,
+    required String videoId,
+  }) async {
+    final lessonIndex = lessonList.indexWhere((l) => l.lessonId == lessonId);
 
-  if (lessonIndex == -1) return false;
+    if (lessonIndex == -1) return false;
 
-  final oldLesson = lessonList[lessonIndex];
+    final oldLesson = lessonList[lessonIndex];
 
-  final updatedVideos = oldLesson.videos.map((v) {
-    if (v.videoId == videoId) {
-      return v.copyWith(isPreview: val);
-    }
-    return v;
-  }).toList();
+    final updatedVideos = oldLesson.videos.map((v) {
+      if (v.videoId == videoId) {
+        return v.copyWith(isPreview: val);
+      }
+      return v;
+    }).toList();
 
-  lessonList[lessonIndex] = oldLesson.copyWith(videos: updatedVideos);
-  notifyListeners();
-
-  try {
-    final success = await useCase.changeIsPreviewUsecase(
-      val: val,
-      lesssonId: lessonId,
-      videoId: videoId,
-    );
-
-    if (!success) {
-      lessonList[lessonIndex] = oldLesson;
-      notifyListeners();
-      return false;
-    }
-
-    return true;
-  } catch (e) {
-    lessonList[lessonIndex] = oldLesson;
+    lessonList[lessonIndex] = oldLesson.copyWith(videos: updatedVideos);
     notifyListeners();
 
-    log("error from change preview provider: $e");
-    return false;
+    try {
+      final success = await useCase.changeIsPreviewUsecase(
+        val: val,
+        lesssonId: lessonId,
+        videoId: videoId,
+      );
+
+      if (!success) {
+        lessonList[lessonIndex] = oldLesson;
+        notifyListeners();
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      lessonList[lessonIndex] = oldLesson;
+      notifyListeners();
+
+      log("error from change preview provider: $e");
+      return false;
+    }
   }
-}
 }

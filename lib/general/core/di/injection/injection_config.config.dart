@@ -79,6 +79,10 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i106.CourseRepo>(
       () => _i618.CourseRepoImpl(gh<_i974.FirebaseFirestore>()),
     );
+    gh.lazySingleton<_i529.LessonRepo>(
+      () =>
+          _i1057.LessonRepoImpl(gh<_i974.FirebaseFirestore>(), gh<_i361.Dio>()),
+    );
     gh.lazySingleton<_i973.SettingsRepo>(
       () => _i86.SettingsRepoImpl(gh<_i974.FirebaseFirestore>()),
     );
@@ -87,9 +91,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i59.FirebaseAuth>(),
         gh<_i974.FirebaseFirestore>(),
       ),
-    );
-    gh.lazySingleton<_i529.LessonRepo>(
-      () => _i1057.LessonRepoImpl(gh<_i974.FirebaseFirestore>()),
     );
     gh.lazySingleton<_i408.AuthLocalDataSource>(
       () => _i408.AuthLocalDataSource(gh<_i460.SharedPreferences>()),

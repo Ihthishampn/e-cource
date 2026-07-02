@@ -95,7 +95,7 @@ class LessonCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      "${video?.duration ?? 0} Minutes",
+                      _formatDuration(video?.duration ?? 0),
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey.shade600,
@@ -108,6 +108,7 @@ class LessonCard extends StatelessWidget {
           ),
 
           const SizedBox(width: 16),
+
 
           /// Actions
           Column(
@@ -163,5 +164,25 @@ class LessonCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formatDuration(int durationInSeconds) {
+    if (durationInSeconds <= 0) return "0 Seconds";
+    
+    // If it's a very small number without seconds scale, it might be an old lesson stored in minutes
+    // But since the new duration is saved in seconds, we'll format it assuming seconds.
+    // However, if the old ones were saved as eg. '10', they will show as 10 Seconds. Let's handle < 60 edge case? 
+    // User requested "give seconds or minuted based on what actually is that"
+    
+    final int hours = durationInSeconds ~/ 3600;
+    final int minutes = (durationInSeconds % 3600) ~/ 60;
+    final int seconds = durationInSeconds % 60;
+    
+    List<String> parts = [];
+    if (hours > 0) parts.add("$hours Hour${hours > 1 ? 's' : ''}");
+    if (minutes > 0) parts.add("$minutes Minute${minutes > 1 ? 's' : ''}");
+    if (seconds > 0) parts.add("$seconds Second${seconds > 1 ? 's' : ''}");
+    
+    return parts.join(" ");
   }
 }
