@@ -11,7 +11,6 @@ class SettingsProvider with ChangeNotifier {
 
   SettingsProvider(this.useCase);
 
-  //  Privacy Policy
 
   AppState privacyGetState = AppState.initial;
   AppState privacyUpdateState = AppState.initial;
@@ -61,7 +60,6 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  //  Terms & Conditions
 
   AppState termsGetState = AppState.initial;
   AppState termsUpdateState = AppState.initial;
@@ -101,8 +99,8 @@ class SettingsProvider with ChangeNotifier {
       );
 
       termsData = {
-        "terms_and_condition_header": header,
-        "terms_and_condition_description": description,
+        "terms_header": header,
+       "terms_description": description,
       };
 
       termsUpdateState = AppState.success;
@@ -114,7 +112,6 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  //  Help & Support
 
   AppState helpGetState = AppState.initial;
   AppState helpUpdateState = AppState.initial;

@@ -23,6 +23,9 @@ class CourseFirebaseProvider with ChangeNotifier {
   // course state
   AppState addCourseState = AppState.initial;
   AppState fetchCourseState = AppState.initial;
+  // delete course state
+  AppState deleteCourseState = AppState.initial;
+  String? deleteCourseError;
   // course error
   String? addCourseerror;
   String? fetchCourseerror;
@@ -183,4 +186,37 @@ class CourseFirebaseProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  // delete
+
+  /// Returns `null` on success, or a user-visible error/info message on failure.
+  Future<String?> handleDeleteCourse(CourseModel course) async {
+    if (deleteCourseState == AppState.loading) return null;
+    deleteCourseState = AppState.loading;
+    deleteCourseError = null;
+    notifyListeners();
+
+    try {
+      await useCase.deleteCourse(
+        courseId: course.id,
+        imageUrl: course.image,
+      );
+
+      // Remove from local list immediately so the UI updates
+      courseList.removeWhere((c) => c.id == course.id);
+      searchCourseList.removeWhere((c) => c.id == course.id);
+
+      deleteCourseState = AppState.success;
+      notifyListeners();
+      return null; // success — no error message
+    } catch (e) {
+      log("error while deleting course in provider: $e");
+      deleteCourseError = e.toString();
+      deleteCourseState = AppState.error;
+      notifyListeners();
+      // Return the exception message so the UI can display it
+      return e.toString().replaceFirst("Exception: ", "");
+    }
+  }
 }
+

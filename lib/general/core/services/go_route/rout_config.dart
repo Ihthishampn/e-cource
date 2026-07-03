@@ -4,6 +4,7 @@ import 'package:e_cource/feature/app_route/presentation/side_navigation_screen.d
 import 'package:e_cource/feature/auth/presentation/view/login_screen.dart';
 import 'package:e_cource/feature/cource/data/model/course_model.dart';
 import 'package:e_cource/feature/cource/presentation/view/cource_screen.dart';
+import 'package:e_cource/feature/exam/presentation/view/add_final_exam_screen.dart';
 import 'package:e_cource/feature/cource/presentation/view/course_details_screen.dart';
 import 'package:e_cource/feature/dashboard/presentation/view/dashbpard_screen.dart';
 import 'package:e_cource/feature/settings/presentation/view/main/settings_screen.dart';
@@ -113,12 +114,27 @@ final router = GoRouter(
                   path: 'details',
                   pageBuilder: (context, state) {
                     final course = state.extra as CourseModel;
-
                     return _customTransitionPage(
                       CourseDetailsScreen(course: course),
                       state,
                     );
                   },
+                  routes: [
+                    GoRoute(
+                      path: 'add-exam',
+                      pageBuilder: (context, state) {
+                        final extra =
+                            state.extra as Map<String, String>;
+                        return _customTransitionPage(
+                          AddFinalExamScreen(
+                            courseId: extra['courseId'] ?? '',
+                            moduleId: extra['moduleId'] ?? '',
+                          ),
+                          state,
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),

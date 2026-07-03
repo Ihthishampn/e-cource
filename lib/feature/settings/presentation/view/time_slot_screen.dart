@@ -68,7 +68,7 @@ class _TimeSlotScreenState extends State<TimeSlotScreen> {
                         border: Border.all(
                           color: isSelected
                               ? AppColors.primaryColor
-                              : Colors.grey.withOpacity(0.3),
+                              : Colors.grey.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Text(
@@ -126,7 +126,7 @@ class _TimeSlotScreenState extends State<TimeSlotScreen> {
                       decoration: BoxDecoration(
                         color: const Color(0xFFF5F5F5),
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
                       ),
                       child: const TextField(
                         decoration: InputDecoration(
@@ -172,7 +172,7 @@ class _TimeSlotScreenState extends State<TimeSlotScreen> {
                       decoration: BoxDecoration(
                         color: const Color(0xFFF5F5F5),
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                        border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
                       ),
                       child: const TextField(
                         decoration: InputDecoration(

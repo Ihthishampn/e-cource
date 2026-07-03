@@ -26,6 +26,14 @@ import 'package:e_cource/feature/cource/data/use_case/course_category_use_case.d
 import 'package:e_cource/feature/cource/domain/course_repo.dart' as _i106;
 import 'package:e_cource/feature/cource/presentation/provider/course_firebase_provider.dart'
     as _i342;
+import 'package:e_cource/feature/exam/data/repo_impl/exam_firebase_repo_impl.dart'
+    as _i404;
+import 'package:e_cource/feature/exam/data/usse_case/exam_firebase_usecase.dart'
+    as _i1008;
+import 'package:e_cource/feature/exam/domain/repo/exam_firebase_repo.dart'
+    as _i968;
+import 'package:e_cource/feature/exam/presentation/provider/add_exam_firebase_provider.dart'
+    as _i326;
 import 'package:e_cource/feature/lesson/data/lesson_repo_impl/lesson_repo_impl.dart'
     as _i1057;
 import 'package:e_cource/feature/lesson/data/lesson_use_case/lesson_use_case.dart'
@@ -76,6 +84,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => firebaseModule.firebaseFirestore(),
     );
     gh.lazySingleton<_i59.FirebaseAuth>(() => firebaseModule.firebaseAuth());
+    gh.lazySingleton<_i968.ExamFirebaseRepo>(
+      () => _i404.ExamFirebaseRepoImpl(gh<_i974.FirebaseFirestore>()),
+    );
     gh.lazySingleton<_i106.CourseRepo>(
       () => _i618.CourseRepoImpl(gh<_i974.FirebaseFirestore>()),
     );
@@ -85,6 +96,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i973.SettingsRepo>(
       () => _i86.SettingsRepoImpl(gh<_i974.FirebaseFirestore>()),
+    );
+    gh.factory<_i1008.ExamFirebaseUsecase>(
+      () => _i1008.ExamFirebaseUsecase(gh<_i968.ExamFirebaseRepo>()),
     );
     gh.lazySingleton<_i292.AuthRepo>(
       () => _i632.AuthRepoImpl(
@@ -115,6 +129,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i1069.SettingsUseCase>(
       () => _i1069.SettingsUseCase(gh<_i973.SettingsRepo>()),
+    );
+    gh.factory<_i326.AddExamFirebaseProvider>(
+      () => _i326.AddExamFirebaseProvider(gh<_i1008.ExamFirebaseUsecase>()),
     );
     gh.lazySingleton<_i967.ModuleUseCase>(
       () => _i967.ModuleUseCase(gh<_i824.ModuleRepo>()),

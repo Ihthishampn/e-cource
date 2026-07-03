@@ -23,7 +23,7 @@ class AddLessonDialogProvider extends ChangeNotifier {
   }
 
   Future<void> pickVideo(TextEditingController minuteController) async {
-    log('[AddLessonDialogProvider] pickVideo: opening file picker');
+    log(' pickVideo: opening file picker');
     final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['mp4'],
@@ -31,7 +31,7 @@ class AddLessonDialogProvider extends ChangeNotifier {
     );
 
     if (result == null || result.files.isEmpty) {
-      log('[AddLessonDialogProvider] pickVideo: no file selected');
+      log(' pickVideo: no file selected');
       selectedVideoError = 'No file selected.';
       pickedVideoBytes = null;
       selectedVideoFileName = null;
@@ -45,7 +45,7 @@ class AddLessonDialogProvider extends ChangeNotifier {
         : '';
 
     if (rawExtension != 'mp4') {
-      log('[AddLessonDialogProvider] pickVideo: invalid extension $rawExtension');
+      log(' pickVideo: invalid extension $rawExtension');
       selectedVideoError = 'Please select a valid MP4 video file.';
       pickedVideoBytes = null;
       selectedVideoFileName = null;
@@ -90,11 +90,11 @@ class AddLessonDialogProvider extends ChangeNotifier {
         html.Url.revokeObjectUrl(url); 
         
         final durationInSeconds = durationDouble.round();
-        log('[AddLessonDialogProvider] pickVideo: Web video duration = $durationInSeconds seconds');
+        log(' pickVideo: Web video duration = $durationInSeconds seconds');
         
         _updateMinuteController(minuteController, durationInSeconds);
       } catch (e) {
-        log('[AddLessonDialogProvider] pickVideo: web video duration error $e');
+        log(' pickVideo: web video duration error $e');
         minuteController.text = '';
       }
     } else if (file.path != null) {
@@ -107,7 +107,7 @@ class AddLessonDialogProvider extends ChangeNotifier {
         
         _updateMinuteController(minuteController, durationInSeconds);
       } catch (e) {
-        log('[AddLessonDialogProvider] pickVideo: unable to read video duration $e');
+        log(' pickVideo: unable to read video duration $e');
         minuteController.text = '';
       }
     }

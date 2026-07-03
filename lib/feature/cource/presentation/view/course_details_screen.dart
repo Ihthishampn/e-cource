@@ -317,7 +317,7 @@ class _CourseDetailsView extends StatelessWidget {
         return const CourseLiveWidget();
 
       case 2:
-        return const CourseExamWidget();
+        return CourseExamWidget(courseId: courseId);
 
       default:
         return const SizedBox();

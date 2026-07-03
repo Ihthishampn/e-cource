@@ -6,4 +6,5 @@ class RouteNames {
   static const String students = "/students";
   static const String studentDetails = "/students/details";
   static const String courseDetails = "/cources/details";
+  static const String addFinalExam = "/cources/details/add-exam";
 }

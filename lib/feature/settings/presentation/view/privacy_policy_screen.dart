@@ -22,13 +22,12 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
     privacyHeaderController = TextEditingController();
     privacyDescriptionController = TextEditingController();
 
-    // Fetch data from firestore when the screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final provider = context.read<SettingsProvider>();
       await provider.getPrivacyPolicy();
       
       if (provider.privacyGetState == AppState.success) {
-        privacyHeaderController.text = provider.privacyData["privacy_heder"] ?? "";
+        privacyHeaderController.text = provider.privacyData["privacy_header"] ?? "";
         privacyDescriptionController.text = provider.privacyData["privacy_description"] ?? "";
       }
     });
@@ -47,12 +46,10 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       padding: const EdgeInsets.only(left: 40, right: 40, bottom: 20),
       child: Consumer<SettingsProvider>(
         builder: (context, provider, child) {
-          // Handle Get Loading State
           if (provider.privacyGetState == AppState.loading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // Handle Get Error State
           if (provider.privacyGetState == AppState.error) {
             return Center(
               child: Column(
@@ -109,7 +106,6 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Update button state handling
                     provider.privacyUpdateState == AppState.loading
                         ? const Center(child: CircularProgressIndicator())
                         : CustomSmallButtonSettings(

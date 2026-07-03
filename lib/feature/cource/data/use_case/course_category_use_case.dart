@@ -52,4 +52,12 @@ class CourseCategoryUseCase {
   Future<List<CourseModel>> searchCOurse({required String query}) async {
     return await repo.searchCourse(query: query);
   }
+
+  // delete course
+  Future<void> deleteCourse({
+    required String courseId,
+    required String imageUrl,
+  }) async {
+    return await repo.deleteCourse(courseId: courseId, imageUrl: imageUrl);
+  }
 }

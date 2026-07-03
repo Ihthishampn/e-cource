@@ -25,6 +25,11 @@ abstract class CourseRepo {
   Future<List<CourseModel>> getCourse();
 
   // search a course
-
   Future<List<CourseModel>> searchCourse({required String query});
+
+  // delete a course
+  Future<void> deleteCourse({
+    required String courseId,
+    required String imageUrl,
+  });
 }

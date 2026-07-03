@@ -28,8 +28,9 @@ class _TermsAndConditionScreenState extends State<TermsAndConditionScreen> {
       await provider.getTermsAndCondition();
       
       if (provider.termsGetState == AppState.success) {
-        headerController.text = provider.termsData["terms_and_condition_header"] ?? "";
-        descriptionController.text = provider.termsData["terms_and_condition_description"] ?? "";
+        headerController.text = provider.termsData["terms_header"
+] ?? "";
+        descriptionController.text = provider.termsData["terms_description"] ?? "";
       }
     });
   }
