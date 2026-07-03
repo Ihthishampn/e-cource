@@ -7,7 +7,7 @@ import 'package:e_cource/feature/settings/presentation/view/payement_option_scre
 import 'package:e_cource/feature/settings/presentation/view/privacy_policy_screen.dart';
 import 'package:e_cource/feature/settings/presentation/view/terms_contition__screen.dart';
 import 'package:e_cource/feature/settings/presentation/view/time_slot_screen.dart';
-import 'package:e_cource/feature/settings/presentation/widgets/selection_Item_settings.dart';
+import 'package:e_cource/feature/settings/presentation/widgets/selection_item_settings.dart';
 import 'package:e_cource/general/core/theme/app_colors.dart';
 import 'package:e_cource/general/widgets/custom_main_header.dart';
 import 'package:flutter/material.dart';

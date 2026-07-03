@@ -36,7 +36,7 @@ class _CourseExamWidgetState extends State<CourseExamWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header ───────────────────────────────────────────────────────
+          //  Header 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -65,7 +65,7 @@ class _CourseExamWidgetState extends State<CourseExamWidget> {
           ),
           const SizedBox(height: 16),
 
-          // ── Exam list from provider ───────────────────────────────────────
+          //  Exam list from provider 
           Consumer<AddExamFirebaseProvider>(
             builder: (context, provider, _) {
               if (provider.fetchExamState == AppState.loading) {
@@ -160,7 +160,7 @@ class _CourseExamWidgetState extends State<CourseExamWidget> {
   }
 }
 
-// ─── Exam card (mirrors the design in the screenshot) ────────────────────────
+//  Exam card
 class _ExamCard extends StatelessWidget {
   final String title;
   final int minutes;
@@ -239,7 +239,7 @@ class _ExamCard extends StatelessWidget {
                   Switch(
                     value: isEnabled,
                     onChanged: onToggle,
-                    activeColor: Colors.green,
+                    activeThumbColor: Colors.green,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                 ],

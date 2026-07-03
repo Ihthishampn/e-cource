@@ -104,6 +104,7 @@ void initState() {
                               if (provider.addMpoduleState ==
                                   AppState.success) {
                                 modulenameController.clear();
+                                // ignore: use_build_context_synchronously
                                 Navigator.pop(context);
                                 showToast(msg: "Module Added");
                               } else {

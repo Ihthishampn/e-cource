@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:developer';
 import 'dart:typed_data';
 
 int getMp4Duration(Uint8List bytes) {
@@ -8,11 +8,10 @@ int getMp4Duration(Uint8List bytes) {
       int size = bytes[offset] << 24 | bytes[offset + 1] << 16 | bytes[offset + 2] << 8 | bytes[offset + 3];
       String type = String.fromCharCodes(bytes.sublist(offset + 4, offset + 8));
       
-      print("Found atom: $type, size: $size, offset: $offset");
+      log("Found atom: $type, size: $size, offset: $offset");
 
       int atomHeaderSize = 8;
       if (size == 1) { // 64-bit size
-        int high = bytes[offset + 8] << 24 | bytes[offset + 9] << 16 | bytes[offset + 10] << 8 | bytes[offset + 11];
         int low = bytes[offset + 12] << 24 | bytes[offset + 13] << 16 | bytes[offset + 14] << 8 | bytes[offset + 15];
         size = low; // Ignore high for < 4GB files
         atomHeaderSize = 16;
@@ -42,7 +41,7 @@ int getMp4Duration(Uint8List bytes) {
         } else {
           duration = bytes[durationOffset] << 24 | bytes[durationOffset + 1] << 16 | bytes[durationOffset + 2] << 8 | bytes[durationOffset + 3];
         }
-        print("Duration: $duration, TimeScale: $timeScale");
+        log("Duration: $duration, TimeScale: $timeScale");
         
         if (timeScale > 0) {
           return (duration / timeScale).round();
@@ -52,7 +51,7 @@ int getMp4Duration(Uint8List bytes) {
       offset += size;
     }
   } catch (e) {
-    print("Error: $e");
+    log("Error: $e");
   }
   return 0;
 }

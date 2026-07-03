@@ -95,7 +95,7 @@ class LessonVideoModel {
       title: title ?? this.title,
       videoUrl: videoUrl ?? this.videoUrl,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
-      duration: durationInSeconds ?? this.duration,
+      duration: durationInSeconds ?? duration,
       isPreview: isPreview ?? this.isPreview,
     );
   }

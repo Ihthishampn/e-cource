@@ -215,14 +215,14 @@ class _AddMainCategoryDialogState extends State<AddMainCategoryDialog> {
               width: 40,
               height: 40,
               fit: BoxFit.cover,
-              placeholder: (_, __) => Center(
+              placeholder: (_, _) => Center(
                 child: SpinKitPianoWave(
                   color: AppColors.primaryColor,
                   size: 40,
                 ),
               ),
-              errorWidget: (_, __, ___) => const Icon(Icons.image),
-            ),
+              errorWidget: (_, _, _) => const Icon(Icons.image),
+            )
           ),
           const SizedBox(width: 12),
 

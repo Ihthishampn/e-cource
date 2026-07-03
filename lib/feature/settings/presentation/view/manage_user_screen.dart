@@ -1,5 +1,6 @@
 import 'package:e_cource/general/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class ManageUserScreen extends StatelessWidget {
   const ManageUserScreen({super.key});
@@ -106,9 +107,8 @@ class ManageUserScreen extends StatelessWidget {
                   ];
                   
                   return ListView.separated(
-                    itemCount: 15, 
-                    physics: const ClampingScrollPhysics(), // Better for web
-                    cacheExtent: 2000, // Keeps items in memory to prevent lag
+                    scrollCacheExtent: ScrollCacheExtent.pixels(2000), itemCount: 15, 
+                    physics: const ClampingScrollPhysics(), // Keeps items in memory to prevent lag
                     separatorBuilder: (context, index) => const SizedBox(height: 16),
                     itemBuilder: (context, index) {
                       final user = dummyData[index % dummyData.length];
@@ -119,7 +119,7 @@ class ManageUserScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.withOpacity(0.2)),
+                      border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
                     ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,7 +129,7 @@ class ManageUserScreen extends StatelessWidget {
                           width: 50,
                           height: 50,
                           decoration: BoxDecoration(
-                            color: AppColors.primaryColor.withOpacity(0.1),
+                            color: AppColors.primaryColor.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Center(
@@ -181,7 +181,7 @@ class ManageUserScreen extends StatelessWidget {
                               child: Switch(
                                 value: true,
                                 onChanged: (val) {},
-                                activeColor: Colors.white,
+                                activeThumbColor: Colors.white,
                                 activeTrackColor: Colors.green,
                               ),
                             ),

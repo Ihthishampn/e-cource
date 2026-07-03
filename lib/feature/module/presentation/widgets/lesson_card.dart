@@ -128,7 +128,7 @@ class LessonCard extends StatelessWidget {
                     child: Switch(
                       value: video?.isPreview ?? false,
                       onChanged: onEnableChanged,
-                      activeColor: Colors.white,
+                      activeThumbColor: Colors.white,
                       activeTrackColor: Colors.green,
                       materialTapTargetSize:
                           MaterialTapTargetSize.shrinkWrap,

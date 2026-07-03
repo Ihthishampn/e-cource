@@ -92,7 +92,7 @@ class _CourseDetailsView extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(.05),
+                  color: Colors.black.withValues(alpha: .05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -273,7 +273,7 @@ class _CourseDetailsView extends StatelessWidget {
         decoration: BoxDecoration(
           color: selected
               ? AppColors.primaryColor
-              : AppColors.primaryColor.withOpacity(.5),
+              : AppColors.primaryColor.withValues(alpha: .5),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
