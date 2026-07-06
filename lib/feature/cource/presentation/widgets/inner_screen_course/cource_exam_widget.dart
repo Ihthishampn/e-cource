@@ -10,8 +10,8 @@ import 'package:toastification/toastification.dart';
 
 class CourseExamWidget extends StatefulWidget {
   final String courseId;
-
-  const CourseExamWidget({super.key, required this.courseId});
+  final String moduleId;
+  const CourseExamWidget({super.key, required this.courseId, required this.moduleId});
 
   @override
   State<CourseExamWidget> createState() => _CourseExamWidgetState();
@@ -23,9 +23,9 @@ class _CourseExamWidgetState extends State<CourseExamWidget> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AddExamFirebaseProvider>().handleFetchExams(
-            courseId: widget.courseId,
-            moduleId: '',
-          );
+        courseId: widget.courseId,
+        moduleId: widget.moduleId,
+      );
     });
   }
 
@@ -36,7 +36,7 @@ class _CourseExamWidgetState extends State<CourseExamWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          //  Header 
+          //  Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -56,7 +56,8 @@ class _CourseExamWidgetState extends State<CourseExamWidget> {
                     RouteNames.addFinalExam,
                     extra: <String, String>{
                       'courseId': widget.courseId,
-                      'moduleId': '',
+                      'moduleId': widget.moduleId,
+                      'moduleName': '', // or however it's fetched if passed to widget
                     },
                   );
                 },
@@ -65,7 +66,7 @@ class _CourseExamWidgetState extends State<CourseExamWidget> {
           ),
           const SizedBox(height: 16),
 
-          //  Exam list from provider 
+          //  Exam list
           Consumer<AddExamFirebaseProvider>(
             builder: (context, provider, _) {
               if (provider.fetchExamState == AppState.loading) {
@@ -77,7 +78,9 @@ class _CourseExamWidgetState extends State<CourseExamWidget> {
                 );
               }
 
-              if (provider.examList.isEmpty) {
+              final exams = provider.examList;
+
+              if (exams.isEmpty) {
                 return Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
@@ -98,20 +101,21 @@ class _CourseExamWidgetState extends State<CourseExamWidget> {
               return ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: provider.examList.length,
+                itemCount: exams.length,
                 itemBuilder: (context, index) {
-                  final exam = provider.examList[index];
+                  final exam = exams[index];
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: _ExamCard(
+                    child: ExamCard(
                       title: 'Final Examination',
                       minutes: exam.duration,
                       totalMarks: exam.totalMarks,
                       passMarks: exam.passMarks,
+                      moduleName: exam.moduleName,
                       isEnabled: exam.isEnabled,
                       onDelete: () => _confirmDelete(context, exam.examId),
                       onEdit: () {
-                        // Edit placeholder or edit screen if needed
+                        // Edit
                       },
                       onToggle: (val) {
                         provider.handleToggleExamStatus(
@@ -144,12 +148,15 @@ class _CourseExamWidgetState extends State<CourseExamWidget> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
-              context.read<AddExamFirebaseProvider>().handleDeleteExam(examId: examId).then((_) {
-                toastification.show(
-                  type: ToastificationType.success,
-                  title: const Text('Exam deleted successfully'),
-                );
-              });
+              context
+                  .read<AddExamFirebaseProvider>()
+                  .handleDeleteExam(examId: examId)
+                  .then((_) {
+                    toastification.show(
+                      type: ToastificationType.success,
+                      title: const Text('Exam deleted successfully'),
+                    );
+                  });
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Delete', style: TextStyle(color: Colors.white)),
@@ -161,21 +168,23 @@ class _CourseExamWidgetState extends State<CourseExamWidget> {
 }
 
 //  Exam card
-class _ExamCard extends StatelessWidget {
+class ExamCard extends StatelessWidget {
   final String title;
   final int minutes;
   final int totalMarks;
   final int passMarks;
+  final String moduleName;
   final bool isEnabled;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
   final ValueChanged<bool> onToggle;
 
-  const _ExamCard({
+  const ExamCard({
     required this.title,
     required this.minutes,
     required this.totalMarks,
     required this.passMarks,
+    required this.moduleName,
     required this.isEnabled,
     required this.onDelete,
     required this.onEdit,
@@ -209,6 +218,10 @@ class _ExamCard extends StatelessWidget {
           _infoRow(Icons.check_circle_outline, 'Total Marks : $totalMarks'),
           const SizedBox(height: 4),
           _infoRow(Icons.person_outline, 'Pass Marks : $passMarks'),
+          if (moduleName.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            _infoRow(Icons.folder_outlined, 'Module : $moduleName'),
+          ],
 
           const SizedBox(height: 12),
 
@@ -218,14 +231,20 @@ class _ExamCard extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: onDelete,
-                icon: const Icon(Icons.delete_outline,
-                    color: Colors.red, size: 22),
+                icon: const Icon(
+                  Icons.delete_outline,
+                  color: Colors.red,
+                  size: 22,
+                ),
                 tooltip: 'Delete',
               ),
               IconButton(
                 onPressed: onEdit,
-                icon: Icon(Icons.edit_outlined,
-                    color: AppColors.primaryColor, size: 22),
+                icon: Icon(
+                  Icons.edit_outlined,
+                  color: AppColors.primaryColor,
+                  size: 22,
+                ),
                 tooltip: 'Edit',
               ),
               const SizedBox(width: 4),
@@ -252,11 +271,10 @@ class _ExamCard extends StatelessWidget {
   }
 
   Widget _infoRow(IconData icon, String text) => Row(
-        children: [
-          Icon(icon, size: 16, color: Colors.black54),
-          const SizedBox(width: 6),
-          Text(text,
-              style: const TextStyle(fontSize: 13, color: Colors.black54)),
-        ],
-      );
+    children: [
+      Icon(icon, size: 16, color: Colors.black54),
+      const SizedBox(width: 6),
+      Text(text, style: const TextStyle(fontSize: 13, color: Colors.black54)),
+    ],
+  );
 }

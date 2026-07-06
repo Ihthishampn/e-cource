@@ -5,6 +5,7 @@ class ExamModel {
   final String examId;
   final String courseId;
   final String moduleId;
+  final String moduleName;
   final int duration;
   final int totalMarks;
   final int passMarks;
@@ -19,6 +20,7 @@ class ExamModel {
     required this.examId,
     required this.courseId,
     required this.moduleId,
+    required this.moduleName,
     required this.duration,
     required this.totalMarks,
     required this.passMarks,
@@ -35,6 +37,7 @@ class ExamModel {
       examId: documentId,
       courseId: map['courseId'] as String? ?? '',
       moduleId: map['moduleId'] as String? ?? '',
+      moduleName: map['moduleName'] as String? ?? '',
       duration: map['duration'] as int? ?? 0,
       totalMarks: map['totalMarks'] as int? ?? 0,
       passMarks: map['passMarks'] as int? ?? 0,
@@ -55,6 +58,7 @@ class ExamModel {
     return {
       'courseId': courseId,
       'moduleId': moduleId,
+      'moduleName': moduleName,
       'duration': duration,
       'totalMarks': totalMarks,
       'passMarks': passMarks,
@@ -71,6 +75,7 @@ class ExamModel {
     String? examId,
     String? courseId,
     String? moduleId,
+    String? moduleName,
     int? duration,
     int? totalMarks,
     int? passMarks,
@@ -85,6 +90,7 @@ class ExamModel {
       examId: examId ?? this.examId,
       courseId: courseId ?? this.courseId,
       moduleId: moduleId ?? this.moduleId,
+      moduleName: moduleName ?? this.moduleName,
       duration: duration ?? this.duration,
       totalMarks: totalMarks ?? this.totalMarks,
       passMarks: passMarks ?? this.passMarks,

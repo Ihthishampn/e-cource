@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// ─── Question data class ──────────────────────────────────────────────────────
 class ExamQuestion {
   final TextEditingController questionCtrl = TextEditingController();
   final List<TextEditingController> optionCtrls = [
@@ -22,37 +21,42 @@ class ExamQuestion {
   }
 }
 
-// ─── Provider ─────────────────────────────────────────────────────────────────
 class ExamLocalProvider extends ChangeNotifier {
-  // -- Exam details --
-  // Duration: selected from predefined minute options
-  int? selectedDuration; // in minutes, null = not chosen
+    String? selectedModuleId;
+  String? selectedModuleName;
+
+  int? selectedDuration;
   static const List<int> durationOptions = [
     5, 10, 15, 20, 30, 45, 60, 90, 120
   ];
 
-  // Marks: text editing controllers for entering numbers
   final TextEditingController totalMarkCtrl = TextEditingController();
   final TextEditingController passMarkCtrl = TextEditingController();
 
-  // -- Terms --
+  // Terms 
   final List<TextEditingController> termCtrls = [TextEditingController()];
 
-  // -- Questions --
+  //  Questions 
   final List<ExamQuestion> questions = [ExamQuestion()];
 
-  // -- Retry --
+  //  Retry 
   bool hasRetry = true;
   String? retryDuration;
   static const retryOptions = ['1 Day', '3 Days', '1 Week', '1 Month'];
 
-  // ── Exam detail setters ────────────────────────────────────────────────────
+  //  Exam detail setters 
   void setDuration(int? value) {
     selectedDuration = value;
     notifyListeners();
   }
 
-  // ── Terms ──────────────────────────────────────────────────────────────────
+  void setModule(String? id, String? name) {
+    selectedModuleId = id;
+    selectedModuleName = name;
+    notifyListeners();
+  }
+
+  //  Terms 
   void addTerm() {
     termCtrls.add(TextEditingController());
     notifyListeners();
@@ -65,7 +69,7 @@ class ExamLocalProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Questions ──────────────────────────────────────────────────────────────
+  //  Questions 
   void addQuestion() {
     questions.add(ExamQuestion());
     notifyListeners();
@@ -78,7 +82,7 @@ class ExamLocalProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Options ────────────────────────────────────────────────────────────────
+  //  Options 
   void addOption(int questionIndex) {
     if (questions[questionIndex].optionCtrls.length >= 6) return;
     questions[questionIndex].optionCtrls.add(TextEditingController());
@@ -101,7 +105,7 @@ class ExamLocalProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Retry ──────────────────────────────────────────────────────────────────
+  //  Retry 
   void setHasRetry(bool value) {
     hasRetry = value;
     if (!hasRetry) retryDuration = null;
@@ -113,7 +117,7 @@ class ExamLocalProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ── Dispose ────────────────────────────────────────────────────────────────
+  //  Dispose 
   @override
   void dispose() {
     totalMarkCtrl.dispose();

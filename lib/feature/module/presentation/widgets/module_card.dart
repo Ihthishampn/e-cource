@@ -8,6 +8,10 @@ import 'package:e_cource/general/widgets/button_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:e_cource/general/core/services/go_route/route_names.dart';
+import 'package:e_cource/feature/exam/presentation/provider/add_exam_firebase_provider.dart';
+import 'package:e_cource/feature/cource/presentation/widgets/inner_screen_course/cource_exam_widget.dart';
 
 class ModuleCard extends StatelessWidget {
   final ModuleModel module;
@@ -163,6 +167,49 @@ class ModuleCard extends StatelessWidget {
   },
 ),
 
+            /// Exams
+            Consumer<AddExamFirebaseProvider>(
+              builder: (context, provider, _) {
+                final exams = provider.examList
+                    .where((exam) => exam.moduleId == module.moduleId)
+                    .toList();
+
+                if (provider.fetchExamState == AppState.loading || exams.isEmpty) {
+                  return const SizedBox();
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Column(
+                    children: exams.map((exam) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: ExamCard(
+                          title: 'Final Examination',
+                          minutes: exam.duration,
+                          totalMarks: exam.totalMarks,
+                          passMarks: exam.passMarks,
+                          moduleName: exam.moduleName,
+                          isEnabled: exam.isEnabled,
+                          onDelete: () {
+                            // Can call provider.handleDeleteExam
+                            provider.handleDeleteExam(examId: exam.examId);
+                          },
+                          onEdit: () {},
+                          onToggle: (val) {
+                            provider.handleToggleExamStatus(
+                              examId: exam.examId,
+                              isEnabled: val,
+                            );
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                );
+              },
+            ),
+
             const SizedBox(height: 12),
 
             /// Buttons
@@ -186,7 +233,16 @@ class ModuleCard extends StatelessWidget {
                 CustomElevatedButton(
                   name: "Add Exam",
                   color: const Color(0xff115C99),
-                  onTap: () {},
+                  onTap: () {
+                    context.push(
+                      RouteNames.addFinalExam,
+                      extra: <String, String>{
+                        'courseId': module.courseId,
+                        'moduleId': module.moduleId,
+                        'moduleName': module.moduleName,
+                      },
+                    );
+                  },
                 ),
                 const Gap(6),
                 CustomElevatedButton(

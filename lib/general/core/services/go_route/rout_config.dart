@@ -129,6 +129,7 @@ final router = GoRouter(
                           AddFinalExamScreen(
                             courseId: extra['courseId'] ?? '',
                             moduleId: extra['moduleId'] ?? '',
+                            moduleName: extra['moduleName'] ?? '',
                           ),
                           state,
                         );

@@ -253,6 +253,7 @@ class _CourseDetailsView extends StatelessWidget {
               child: _buildSelectedScreen(
                 context: context,
                 courseId: course.id,
+                moduleId: '',
               ),
             ),
           ],
@@ -306,6 +307,7 @@ class _CourseDetailsView extends StatelessWidget {
   Widget _buildSelectedScreen({
     required BuildContext context,
     required String courseId,
+    required String moduleId,
   }) {
     final tab = context.watch<CourseProvider>().selectedTabIndex;
 
@@ -317,7 +319,7 @@ class _CourseDetailsView extends StatelessWidget {
         return const CourseLiveWidget();
 
       case 2:
-        return CourseExamWidget(courseId: courseId);
+        return CourseExamWidget(courseId: courseId,moduleId: moduleId,);
 
       default:
         return const SizedBox();

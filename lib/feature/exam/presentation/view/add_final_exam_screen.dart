@@ -3,6 +3,7 @@ import 'package:e_cource/feature/exam/presentation/provider/exam_local_provider.
 import 'package:e_cource/feature/exam/presentation/provider/add_exam_firebase_provider.dart';
 import 'package:e_cource/feature/exam/data/model/exam_model.dart';
 import 'package:e_cource/feature/exam/data/model/exam_question_model.dart';
+import 'package:e_cource/feature/module/presentation/provider/module_provider.dart';
 import 'package:e_cource/general/enums/app_state.dart';
 import 'package:toastification/toastification.dart';
 import 'package:e_cource/general/core/theme/app_colors.dart';
@@ -14,18 +15,23 @@ import 'package:provider/provider.dart';
 class AddFinalExamScreen extends StatelessWidget {
   final String courseId;
   final String moduleId;
+  final String moduleName;
 
   const AddFinalExamScreen({
     super.key,
     required this.courseId,
     required this.moduleId,
+    required this.moduleName,
   });
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => ExamLocalProvider(),
-      child: _AddFinalExamView(courseId: courseId, moduleId: moduleId),
+      create: (_) => ExamLocalProvider()..setModule(
+        moduleId.isNotEmpty ? moduleId : null,
+        moduleName.isNotEmpty ? moduleName : null,
+      ),
+      child: _AddFinalExamView(courseId: courseId, moduleId: moduleId, moduleName: moduleName),
     );
   }
 }
@@ -33,10 +39,12 @@ class AddFinalExamScreen extends StatelessWidget {
 class _AddFinalExamView extends StatelessWidget {
   final String courseId;
   final String moduleId;
+  final String moduleName;
 
   const _AddFinalExamView({
     required this.courseId,
     required this.moduleId,
+    required this.moduleName,
   });
 
   static const _fieldFill = Color(0xFFF0F0F0);
@@ -135,6 +143,51 @@ class _AddFinalExamView extends StatelessWidget {
         ],
       );
 
+  Widget _buildModuleDropdown(BuildContext context, ExamLocalProvider p) {
+    final modules = context.read<ModuleProvider>().moduleList;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Module (Optional)',
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+        const SizedBox(height: 6),
+        Container(
+          decoration: BoxDecoration(
+            color: _fieldFill,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true,
+              value: p.selectedModuleId,
+              hint: Text('Select module',
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 13)),
+              items: [
+                const DropdownMenuItem<String>(
+                  value: null,
+                  child: Text('No Module (Course Level)', style: TextStyle(fontSize: 13)),
+                ),
+                ...modules.map((m) => DropdownMenuItem(
+                      value: m.moduleId,
+                      child: Text(m.moduleName, style: const TextStyle(fontSize: 13)),
+                    )),
+              ],
+              onChanged: (v) {
+                if (v == null) {
+                  p.setModule(null, null);
+                } else {
+                  final name = modules.firstWhere((m) => m.moduleId == v).moduleName;
+                  p.setModule(v, name);
+                }
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildExamDetails(BuildContext context, ExamLocalProvider p) => _card(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,11 +197,21 @@ class _AddFinalExamView extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Module dropdown
+                Expanded(
+                  child: _buildModuleDropdown(context, p),
+                ),
+                const SizedBox(width: 12),
                 // Duration dropdown
                 Expanded(
                   child: _buildDurationDropdown(context, p),
                 ),
-                const SizedBox(width: 12),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 // Total Marks text field
                 Expanded(
                   child: Column(
@@ -241,7 +304,7 @@ class _AddFinalExamView extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: _primaryBtn('Add Another Question',
-                  () => context.read<ExamLocalProvider>().addQuestion()),
+      () => context.read<ExamLocalProvider>().addQuestion()),
             ),
           ],
         ),
@@ -662,9 +725,9 @@ class _AddFinalExamView extends StatelessWidget {
           .map((ctrl) => ctrl.text.trim())
           .where((text) => text.isNotEmpty)
           .toList();
-      log("[AddFinalExamView] Question ${i + 1} options count: ${options.length}");
+      log("AddFinalExamView Question ${i + 1} options count: ${options.length}");
       if (options.length < 2) {
-        log("[AddFinalExamView] Validation failed: Question ${i + 1} has less than 2 options");
+        log("AddFinalExamView Validation failed: Question ${i + 1} has less than 2 options");
         toastification.show(
           type: ToastificationType.warning,
           title: Text('Question ${i + 1} must have at least 2 non-empty options'),
@@ -680,7 +743,7 @@ class _AddFinalExamView extends StatelessWidget {
     }
 
     if (p.hasRetry && p.retryDuration == null) {
-      log("[AddFinalExamView] Validation failed: hasRetry is true but retryDuration is null");
+      log("AddFinalExamView Validation failed: hasRetry is true but retryDuration is null");
       toastification.show(
         type: ToastificationType.warning,
         title: const Text('Please select a retry duration'),
@@ -691,7 +754,8 @@ class _AddFinalExamView extends StatelessWidget {
     final exam = ExamModel(
       examId: '',
       courseId: courseId,
-      moduleId: moduleId,
+      moduleId: p.selectedModuleId ?? '',
+      moduleName: p.selectedModuleName ?? '',
       duration: duration,
       totalMarks: totalMarks,
       passMarks: passMarks,
@@ -703,13 +767,13 @@ class _AddFinalExamView extends StatelessWidget {
       createdAt: DateTime.now(),
     );
 
-    log("[AddFinalExamView] Validation successful. Proceeding to save exam via AddExamFirebaseProvider...");
+    log("AddFinalExamView Validation successful. Proceeding to save exam via AddExamFirebaseProvider...");
     final firebaseProvider = context.read<AddExamFirebaseProvider>();
     await firebaseProvider.handleAddExam(model: exam);
 
     if (context.mounted) {
       if (firebaseProvider.addExamState == AppState.success) {
-        log("[AddFinalExamView] Exam saved successfully, clearing fields and popping screen.");
+        log("AddFinalExamView Exam saved successfully, clearing fields and popping screen.");
         p.clearFields();
         toastification.show(
           type: ToastificationType.success,
@@ -717,7 +781,7 @@ class _AddFinalExamView extends StatelessWidget {
         );
         context.pop();
       } else {
-        log("[AddFinalExamView] Failed to save exam: ${firebaseProvider.addExamError}");
+        log("AddFinalExamView Failed to save exam: ${firebaseProvider.addExamError}");
         toastification.show(
           type: ToastificationType.error,
           title: Text(firebaseProvider.addExamError ?? 'Failed to save exam'),

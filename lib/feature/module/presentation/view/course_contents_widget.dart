@@ -8,6 +8,7 @@ import 'package:e_cource/general/widgets/button_with_icon.dart';
 import 'package:e_cource/general/widgets/custom_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:e_cource/feature/exam/presentation/provider/add_exam_firebase_provider.dart';
 
 class CourseContentsWidget extends StatefulWidget {
   final String courseId;
@@ -37,6 +38,7 @@ void initState() {
     await Future.wait([
       moduleProvider.handleFetch(widget.courseId),
       lessonProvider.handleGetLesson(widget.courseId),
+      context.read<AddExamFirebaseProvider>().handleFetchExams(courseId: widget.courseId, moduleId: ''),
     ]);
   });
 }
