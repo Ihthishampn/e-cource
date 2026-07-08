@@ -1,8 +1,27 @@
+import 'package:e_cource/feature/settings/domain/model/zoom_account_model.dart';
+import 'package:e_cource/feature/settings/presentation/provider/live_settings_provider.dart';
+import 'package:e_cource/feature/settings/presentation/widgets/add_zoom_account_dialog.dart';
+import 'package:e_cource/general/core/di/injection/injection_config.dart';
 import 'package:e_cource/general/core/theme/app_colors.dart';
+import 'package:e_cource/general/enums/app_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 class LiveSettingsScreen extends StatelessWidget {
   const LiveSettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => sl<LiveSettingsProvider>()..fetchZoomAccounts(),
+      child: const _LiveSettingsBody(),
+    );
+  }
+}
+
+class _LiveSettingsBody extends StatelessWidget {
+  const _LiveSettingsBody();
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +33,7 @@ class LiveSettingsScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                "Zoom Accounts",
+                'Zoom Accounts',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -22,7 +41,7 @@ class LiveSettingsScreen extends StatelessWidget {
                 ),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () => _showAddDialog(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryColor,
                   foregroundColor: Colors.white,
@@ -44,45 +63,76 @@ class LiveSettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // List of Accounts
+          // List
           Expanded(
-            child: ListView.separated(
-              physics: const ClampingScrollPhysics(),
-              itemCount: 3,
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
-              itemBuilder: (context, index) {
-                final accounts = [
-                  {
-                    'name': 'code2 live',
-                    'id': '8755047271',
-                    'start':
-                        'https://us-central1-code-7-241f2.cloudfunctions.net/zoomWebhook/meetingStart/CVbT4ewSV... ',
-                    'end':
-                        'https://us-central1-code-7-241f2.cloudfunctions.net/zoomWebhook/meetingEnd/CVbT4ewSV... ',
-                  },
-                  {
-                    'name': 'code zoom account 1',
-                    'id': '8755047271',
-                    'start':
-                        'https://us-central1-code-7-241f2.cloudfunctions.net/zoomWebhook/meetingStart/ISvTtOs...',
-                    'end':
-                        'https://us-central1-code-7-241f2.cloudfunctions.net/zoomWebhook/meetingEnd/ISvTtOs...',
-                  },
-                  {
-                    'name': 'code 7',
-                    'id': '2776911247',
-                    'start':
-                        'https://us-central1-code-7-241f2.cloudfunctions.net/zoomWebhook/meetingStart/ulkiqNMV...',
-                    'end':
-                        'https://us-central1-code-7-241f2.cloudfunctions.net/zoomWebhook/meetingEnd/ulkiqNMV...',
-                  },
-                ];
+            child: Consumer<LiveSettingsProvider>(
+              builder: (context, provider, _) {
+                // Loading
+                if (provider.fetchState == AppState.loading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-                return ZoomAccountCard(
-                  accountName: accounts[index]['name']!,
-                  meetingId: accounts[index]['id']!,
-                  startWebhook: accounts[index]['start']!,
-                  endWebhook: accounts[index]['end']!,
+                // Error
+                if (provider.fetchState == AppState.error) {
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.error_outline,
+                            size: 48, color: Colors.redAccent),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Failed to load Zoom accounts.',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        const SizedBox(height: 16),
+                        TextButton(
+                          onPressed: () =>
+                              provider.fetchZoomAccounts(),
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                // Empty
+                if (provider.zoomAccounts.isEmpty) {
+                  return const Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.video_call_outlined,
+                            size: 56, color: Colors.grey),
+                        SizedBox(height: 12),
+                        Text(
+                          'No Zoom accounts yet.',
+                          style: TextStyle(color: Colors.grey, fontSize: 15),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Tap "Add Account" to get started.',
+                          style: TextStyle(color: Colors.grey, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                // Data
+                return ListView.separated(
+                  physics: const ClampingScrollPhysics(),
+                  itemCount: provider.zoomAccounts.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 16),
+                  itemBuilder: (context, index) {
+                    final account = provider.zoomAccounts[index];
+                    return ZoomAccountCard(
+                      account: account,
+                      onDelete: () => _confirmDelete(context, provider, account),
+                    );
+                  },
                 );
               },
             ),
@@ -91,20 +141,55 @@ class LiveSettingsScreen extends StatelessWidget {
       ),
     );
   }
+
+  void _showAddDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => ChangeNotifierProvider.value(
+        value: context.read<LiveSettingsProvider>(),
+        child: const AddZoomAccountDialog(),
+      ),
+    );
+  }
+
+  void _confirmDelete(
+    BuildContext context,
+    LiveSettingsProvider provider,
+    ZoomAccountModel account,
+  ) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Delete Account'),
+        content: Text(
+            'Delete "${account.accountName}"? This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              provider.deleteZoomAccount(account.id);
+            },
+            child: const Text('Delete',
+                style: TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
+  }
 }
-   
+
 class ZoomAccountCard extends StatelessWidget {
-  final String accountName;
-  final String meetingId;
-  final String startWebhook;
-  final String endWebhook;
+  final ZoomAccountModel account;
+  final VoidCallback onDelete;
 
   const ZoomAccountCard({
     super.key,
-    required this.accountName,
-    required this.meetingId,
-    required this.startWebhook,
-    required this.endWebhook,
+    required this.account,
+    required this.onDelete,
   });
 
   @override
@@ -131,7 +216,7 @@ class ZoomAccountCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  accountName,
+                  account.accountName,
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -140,34 +225,29 @@ class ZoomAccountCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Meeting Id : $meetingId',
+                  'Meeting Id : ${account.meetingId}',
                   style: const TextStyle(fontSize: 13, color: Colors.grey),
                 ),
                 const SizedBox(height: 16),
-                _buildWebhookRow('Meeting Start Webhook :', startWebhook),
+                _buildWebhookRow(
+                    'Meeting Start Webhook :', account.startWebhookUrl),
                 const SizedBox(height: 10),
-                _buildWebhookRow('Meeting End Webhook :', endWebhook),
+                _buildWebhookRow(
+                    'Meeting End Webhook :', account.endWebhookUrl),
+                const SizedBox(height: 10),
+                _buildWebhookRow(
+                    'Recording Webhook :', account.recordingWebhookUrl),
               ],
             ),
           ),
 
-          // Action Icons
+          // Actions
           Column(
             children: [
               IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.edit, size: 18, color: Colors.grey),
-                constraints: const BoxConstraints(),
-                padding: EdgeInsets.zero,
-              ),
-              const SizedBox(height: 16),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.delete_outline,
-                  size: 20,
-                  color: Colors.grey,
-                ),
+                onPressed: onDelete,
+                icon: const Icon(Icons.delete_outline,
+                    size: 20, color: Colors.grey),
                 constraints: const BoxConstraints(),
                 padding: EdgeInsets.zero,
               ),
@@ -199,8 +279,14 @@ class ZoomAccountCard extends StatelessWidget {
         ),
         const SizedBox(width: 12),
         InkWell(
-          onTap: () {},
-          child: const Icon(Icons.copy, size: 16, color: Colors.grey),
+          onTap: () {
+            Clipboard.setData(ClipboardData(text: url));
+          },
+          borderRadius: BorderRadius.circular(4),
+          child: const Padding(
+            padding: EdgeInsets.all(4),
+            child: Icon(Icons.copy, size: 16, color: Colors.grey),
+          ),
         ),
       ],
     );

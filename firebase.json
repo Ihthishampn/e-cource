@@ -1,1 +1,72 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"ecommerce-test-54853","appId":"1:368682073122:android:c4c1c3337f2f4c7bc31e7b","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"ecommerce-test-54853","configurations":{"android":"1:368682073122:android:c4c1c3337f2f4c7bc31e7b","ios":"1:368682073122:ios:ef8711a92433b46ac31e7b","macos":"1:368682073122:ios:ef8711a92433b46ac31e7b","web":"1:368682073122:web:1dd0e1ba2d025a73c31e7b","windows":"1:368682073122:web:ea34f870da9f384fc31e7b"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "ecommerce-test-54853",
+          "appId": "1:368682073122:android:c4c1c3337f2f4c7bc31e7b",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "ecommerce-test-54853",
+          "configurations": {
+            "android": "1:368682073122:android:c4c1c3337f2f4c7bc31e7b",
+            "ios": "1:368682073122:ios:ef8711a92433b46ac31e7b",
+            "macos": "1:368682073122:ios:ef8711a92433b46ac31e7b",
+            "web": "1:368682073122:web:1dd0e1ba2d025a73c31e7b",
+            "windows": "1:368682073122:web:ea34f870da9f384fc31e7b"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          },
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://source.zoom.us https://appssdk.zoom.us; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; connect-src 'self' https: wss:; frame-src 'self' https://*.zoom.us;"
+          }
+        ]
+      }
+    ]
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": []
+    }
+  ]
+}

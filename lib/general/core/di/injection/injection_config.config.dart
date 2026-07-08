@@ -54,6 +54,8 @@ import 'package:e_cource/feature/settings/data/use_case/settings_use_case.dart'
     as _i1069;
 import 'package:e_cource/feature/settings/domain/repo/settings_repo.dart'
     as _i973;
+import 'package:e_cource/feature/settings/presentation/provider/live_settings_provider.dart'
+    as _i767;
 import 'package:e_cource/feature/settings/presentation/provider/settings_provider.dart'
     as _i116;
 import 'package:e_cource/general/core/di/module/dio_client.dart' as _i733;
@@ -141,6 +143,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i794.LessonProvider>(
       () => _i794.LessonProvider(gh<_i799.LessonUseCase>()),
+    );
+    gh.factory<_i767.LiveSettingsProvider>(
+      () => _i767.LiveSettingsProvider(gh<_i1069.SettingsUseCase>()),
     );
     gh.factory<_i116.SettingsProvider>(
       () => _i116.SettingsProvider(gh<_i1069.SettingsUseCase>()),

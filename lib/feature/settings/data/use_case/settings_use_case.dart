@@ -1,3 +1,4 @@
+import 'package:e_cource/feature/settings/domain/model/zoom_account_model.dart';
 import 'package:e_cource/feature/settings/domain/repo/settings_repo.dart';
 import 'package:injectable/injectable.dart';
 
@@ -52,5 +53,19 @@ class SettingsUseCase {
 
   Future<Map<String, dynamic>> helpAndSupportGet() {
     return repo.helpAndSupportGet();
+  }
+
+  //  Zoom Accounts 
+
+  Future<String> addZoomAccount(ZoomAccountModel account) {
+    return repo.addZoomAccount(account);
+  }
+
+  Future<void> deleteZoomAccount(String accountId) {
+    return repo.deleteZoomAccount(accountId);
+  }
+
+  Future<List<ZoomAccountModel>> getZoomAccounts() {
+    return repo.getZoomAccounts();
   }
 }

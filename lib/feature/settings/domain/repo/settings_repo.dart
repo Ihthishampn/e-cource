@@ -1,3 +1,5 @@
+import 'package:e_cource/feature/settings/domain/model/zoom_account_model.dart';
+
 abstract class SettingsRepo {
   // Privacy Policy
 
@@ -26,4 +28,12 @@ abstract class SettingsRepo {
   });
 
   Future<Map<String, dynamic>> helpAndSupportGet();
+
+  // Zoom Accounts
+
+  Future<String> addZoomAccount(ZoomAccountModel account);
+
+  Future<void> deleteZoomAccount(String accountId);
+
+  Future<List<ZoomAccountModel>> getZoomAccounts();
 }

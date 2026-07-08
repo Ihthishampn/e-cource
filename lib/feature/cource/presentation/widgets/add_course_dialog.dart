@@ -36,7 +36,7 @@ class AddCourseDialog extends StatelessWidget {
       child: const _AddCourseDialogBody(),
     );
   }
-}
+} 
 
 class _AddCourseDialogBody extends StatefulWidget {
   const _AddCourseDialogBody();
