@@ -10,7 +10,7 @@ import 'package:injectable/injectable.dart';
 class CourseCategoryUseCase {
   final CourseRepo repo;
   CourseCategoryUseCase(this.repo);
-  // add main category ----------------- //
+  // add main category  
 
   //add
   Future<AddMainCategoryModel> addMainCategory({
@@ -32,7 +32,7 @@ class CourseCategoryUseCase {
     return await repo.searchCategory(query: q);
   }
 
-  //    course seccionn ---------------//
+  //    course seccionn 
   // add
   Future<CourseModel> addCourse({
     required CourseModel model,

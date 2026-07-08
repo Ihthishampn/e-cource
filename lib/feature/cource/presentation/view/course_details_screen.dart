@@ -316,7 +316,7 @@ class _CourseDetailsView extends StatelessWidget {
         return CourseContentsWidget(courseId: courseId);
 
       case 1:
-        return const CourseLiveWidget();
+        return CourseLiveWidget(course: course);
 
       case 2:
         return CourseExamWidget(courseId: courseId,moduleId: moduleId,);

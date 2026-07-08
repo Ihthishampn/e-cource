@@ -21,11 +21,18 @@ import 'package:e_cource/feature/auth/presentation/provider/auth_provider.dart'
     as _i966;
 import 'package:e_cource/feature/cource/data/repo_impl/course_repo_impl.dart'
     as _i618;
+import 'package:e_cource/feature/cource/data/repo_impl/live_repo_impl.dart'
+    as _i629;
 import 'package:e_cource/feature/cource/data/use_case/course_category_use_case.dart'
     as _i903;
+import 'package:e_cource/feature/cource/data/use_case/live_use_case.dart'
+    as _i432;
 import 'package:e_cource/feature/cource/domain/course_repo.dart' as _i106;
+import 'package:e_cource/feature/cource/domain/live_repo.dart' as _i355;
 import 'package:e_cource/feature/cource/presentation/provider/course_firebase_provider.dart'
     as _i342;
+import 'package:e_cource/feature/cource/presentation/provider/live_provider.dart'
+    as _i745;
 import 'package:e_cource/feature/exam/data/repo_impl/exam_firebase_repo_impl.dart'
     as _i404;
 import 'package:e_cource/feature/exam/data/usse_case/exam_firebase_usecase.dart'
@@ -111,6 +118,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i408.AuthLocalDataSource>(
       () => _i408.AuthLocalDataSource(gh<_i460.SharedPreferences>()),
     );
+    gh.lazySingleton<_i355.LiveRepo>(
+      () => _i629.LiveRepoImpl(gh<_i974.FirebaseFirestore>()),
+    );
     gh.lazySingleton<_i903.CourseCategoryUseCase>(
       () => _i903.CourseCategoryUseCase(gh<_i106.CourseRepo>()),
     );
@@ -138,6 +148,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i967.ModuleUseCase>(
       () => _i967.ModuleUseCase(gh<_i824.ModuleRepo>()),
     );
+    gh.lazySingleton<_i432.LiveUseCase>(
+      () => _i432.LiveUseCase(gh<_i355.LiveRepo>()),
+    );
     gh.factory<_i5.ModuleProvider>(
       () => _i5.ModuleProvider(gh<_i967.ModuleUseCase>()),
     );
@@ -149,6 +162,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i116.SettingsProvider>(
       () => _i116.SettingsProvider(gh<_i1069.SettingsUseCase>()),
+    );
+    gh.factory<_i745.LiveProvider>(
+      () => _i745.LiveProvider(gh<_i432.LiveUseCase>()),
     );
     return this;
   }

@@ -75,7 +75,7 @@ export const createZoomMeetingIhthisham = onCall(async (request) => {
         console.log(`🚀 Zoom Meeting Created: ${meetingResponse.data.id}`);
 
         console.log("ihthisham");
-        return meetingResponse.data;
+        return JSON.stringify(meetingResponse.data);
 
     } catch (error: any) {
         const errorData = error.response?.data;

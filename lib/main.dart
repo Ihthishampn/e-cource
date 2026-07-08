@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:e_cource/feature/auth/presentation/provider/auth_provider.dart';
 import 'package:e_cource/feature/cource/presentation/provider/course_firebase_provider.dart';
 import 'package:e_cource/feature/cource/presentation/provider/course_provider.dart';
+import 'package:e_cource/feature/cource/presentation/provider/live_provider.dart';
 import 'package:e_cource/feature/lesson/presentation/provider/lesson_provider.dart';
 import 'package:e_cource/feature/exam/presentation/provider/add_exam_firebase_provider.dart';
 import 'package:e_cource/feature/module/presentation/provider/module_provider.dart';
@@ -50,6 +51,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => sl<AddExamFirebaseProvider>()),
         ChangeNotifierProvider(create: (context) => SettingsTabProvider()),
         ChangeNotifierProvider(create: (context) => CourseProvider()),
+        ChangeNotifierProvider(create: (context) => sl<LiveProvider>()),
       ],
       child: const EcourceApp(),
     ),
